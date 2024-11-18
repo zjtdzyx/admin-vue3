@@ -17,14 +17,17 @@ const menuStore = useMenuStore()
 
 const isShow = ref(false)
 
-watch(() => settingsStore.settings.menu.mode, (value) => {
-  if (value === 'single') {
-    menuStore.setActived(0)
-  }
-  else {
-    menuStore.setActived(route.fullPath)
-  }
-})
+watch(
+  () => settingsStore.settings.menu.mode,
+  (value) => {
+    if (value === 'single') {
+      menuStore.setActived(0)
+    }
+    else {
+      menuStore.setActived(route.fullPath)
+    }
+  },
+)
 
 onMounted(() => {
   eventBus.on('global-app-setting-toggle', () => {
@@ -46,7 +49,10 @@ function isObject(value: any) {
   return typeof value === 'object' && !Array.isArray(value)
 }
 // 比较两个对象，并提取出不同的部分
-function getObjectDiff(originalObj: Record<string, any>, diffObj: Record<string, any>) {
+function getObjectDiff(
+  originalObj: Record<string, any>,
+  diffObj: Record<string, any>,
+) {
   if (!isObject(originalObj) || !isObject(diffObj)) {
     return diffObj
   }
@@ -70,7 +76,13 @@ function getObjectDiff(originalObj: Record<string, any>, diffObj: Record<string,
 }
 
 function handleCopy() {
-  copy(JSON.stringify(getObjectDiff(settingsDefault, settingsStore.settings), null, 2))
+  copy(
+    JSON.stringify(
+      getObjectDiff(settingsDefault, settingsStore.settings),
+      null,
+      2,
+    ),
+  )
 }
 </script>
 
@@ -78,7 +90,8 @@ function handleCopy() {
   <HSlideover v-model="isShow" title="应用配置">
     <div class="rounded-2 bg-rose/20 px-4 py-2 text-sm/6 c-rose">
       <p class="my-1">
-        应用配置可实时预览效果，但只是临时生效，要想真正应用于项目，可以点击下方的「复制配置」按钮，并将配置粘贴到 src/settings.ts 文件中。
+        应用配置可实时预览效果，但只是临时生效，要想真正应用于项目，可以点击下方的「复制配置」按钮，并将配置粘贴到
+        src/settings.ts 文件中。
       </p>
       <p class="my-1">
         注意：在生产环境中应关闭该模块。
@@ -103,17 +116,29 @@ function handleCopy() {
     </div>
     <div v-if="settingsStore.mode === 'pc'" class="menu-mode">
       <HTooltip text="侧边栏模式 (含主导航)" placement="bottom" :delay="500">
-        <div class="mode mode-side" :class="{ active: settingsStore.settings.menu.mode === 'side' }" @click="settingsStore.settings.menu.mode = 'side'">
+        <div
+          class="mode mode-side"
+          :class="{ active: settingsStore.settings.menu.mode === 'side' }"
+          @click="settingsStore.settings.menu.mode = 'side'"
+        >
           <div class="mode-container" />
         </div>
       </HTooltip>
       <HTooltip text="顶部模式" placement="bottom" :delay="500">
-        <div class="mode mode-head" :class="{ active: settingsStore.settings.menu.mode === 'head' }" @click="settingsStore.settings.menu.mode = 'head'">
+        <div
+          class="mode mode-head"
+          :class="{ active: settingsStore.settings.menu.mode === 'head' }"
+          @click="settingsStore.settings.menu.mode = 'head'"
+        >
           <div class="mode-container" />
         </div>
       </HTooltip>
       <HTooltip text="侧边栏模式 (不含主导航)" placement="bottom" :delay="500">
-        <div class="mode mode-single" :class="{ active: settingsStore.settings.menu.mode === 'single' }" @click="settingsStore.settings.menu.mode = 'single'">
+        <div
+          class="mode mode-single"
+          :class="{ active: settingsStore.settings.menu.mode === 'single' }"
+          @click="settingsStore.settings.menu.mode = 'single'"
+        >
           <div class="mode-container" />
         </div>
       </HTooltip>
@@ -124,11 +149,16 @@ function handleCopy() {
     <div class="setting-item">
       <div class="label">
         主导航切换跳转
-        <HTooltip text="开启该功能后，切换主导航时，页面自动跳转至该主导航下，次导航里第一个导航">
+        <HTooltip
+          text="开启该功能后，切换主导航时，页面自动跳转至该主导航下，次导航里第一个导航"
+        >
           <SvgIcon name="i-ri:question-line" />
         </HTooltip>
       </div>
-      <HToggle v-model="settingsStore.settings.menu.switchMainMenuAndPageJump" :disabled="['single'].includes(settingsStore.settings.menu.mode)" />
+      <HToggle
+        v-model="settingsStore.settings.menu.switchMainMenuAndPageJump"
+        :disabled="['single'].includes(settingsStore.settings.menu.mode)"
+      />
     </div>
     <div class="setting-item">
       <div class="label">
@@ -149,13 +179,18 @@ function handleCopy() {
       <div class="label">
         显示次导航折叠按钮
       </div>
-      <HToggle v-model="settingsStore.settings.menu.enableSubMenuCollapseButton" />
+      <HToggle
+        v-model="settingsStore.settings.menu.enableSubMenuCollapseButton"
+      />
     </div>
     <div class="setting-item">
       <div class="label">
         是否启用快捷键
       </div>
-      <HToggle v-model="settingsStore.settings.menu.enableHotkeys" :disabled="['single'].includes(settingsStore.settings.menu.mode)" />
+      <HToggle
+        v-model="settingsStore.settings.menu.enableHotkeys"
+        :disabled="['single'].includes(settingsStore.settings.menu.mode)"
+      />
     </div>
     <div class="divider">
       顶栏
@@ -165,7 +200,8 @@ function handleCopy() {
         模式
       </div>
       <HCheckList
-        v-model="settingsStore.settings.topbar.mode" :options="[
+        v-model="settingsStore.settings.topbar.mode"
+        :options="[
           { label: '静止', value: 'static' },
           { label: '固定', value: 'fixed' },
           { label: '粘性', value: 'sticky' },
@@ -186,13 +222,19 @@ function handleCopy() {
         <div class="label">
           是否显示图标
         </div>
-        <HToggle v-model="settingsStore.settings.tabbar.enableIcon" :disabled="!settingsStore.settings.tabbar.enable" />
+        <HToggle
+          v-model="settingsStore.settings.tabbar.enableIcon"
+          :disabled="!settingsStore.settings.tabbar.enable"
+        />
       </div>
       <div class="setting-item">
         <div class="label">
           是否启用快捷键
         </div>
-        <HToggle v-model="settingsStore.settings.tabbar.enableHotkeys" :disabled="!settingsStore.settings.tabbar.enable" />
+        <HToggle
+          v-model="settingsStore.settings.tabbar.enableHotkeys"
+          :disabled="!settingsStore.settings.tabbar.enable"
+        />
       </div>
     </div>
     <div class="divider">
@@ -253,7 +295,10 @@ function handleCopy() {
       <div class="label">
         是否启用快捷键
       </div>
-      <HToggle v-model="settingsStore.settings.navSearch.enableHotkeys" :disabled="!settingsStore.settings.toolbar.navSearch" />
+      <HToggle
+        v-model="settingsStore.settings.navSearch.enableHotkeys"
+        :disabled="!settingsStore.settings.toolbar.navSearch"
+      />
     </div>
     <div class="divider">
       底部版权
@@ -268,25 +313,37 @@ function handleCopy() {
       <div class="label">
         日期
       </div>
-      <HInput v-model="settingsStore.settings.copyright.dates" :disabled="!settingsStore.settings.copyright.enable" />
+      <HInput
+        v-model="settingsStore.settings.copyright.dates"
+        :disabled="!settingsStore.settings.copyright.enable"
+      />
     </div>
     <div class="setting-item">
       <div class="label">
         公司
       </div>
-      <HInput v-model="settingsStore.settings.copyright.company" :disabled="!settingsStore.settings.copyright.enable" />
+      <HInput
+        v-model="settingsStore.settings.copyright.company"
+        :disabled="!settingsStore.settings.copyright.enable"
+      />
     </div>
     <div class="setting-item">
       <div class="label">
         网址
       </div>
-      <HInput v-model="settingsStore.settings.copyright.website" :disabled="!settingsStore.settings.copyright.enable" />
+      <HInput
+        v-model="settingsStore.settings.copyright.website"
+        :disabled="!settingsStore.settings.copyright.enable"
+      />
     </div>
     <div class="setting-item">
       <div class="label">
         备案
       </div>
-      <HInput v-model="settingsStore.settings.copyright.beian" :disabled="!settingsStore.settings.copyright.enable" />
+      <HInput
+        v-model="settingsStore.settings.copyright.beian"
+        :disabled="!settingsStore.settings.copyright.enable"
+      />
     </div>
     <div class="divider">
       主页
@@ -294,7 +351,9 @@ function handleCopy() {
     <div class="setting-item">
       <div class="label">
         是否启用
-        <HTooltip text="该功能开启时，登录成功默认进入主页，反之则默认进入导航栏里第一个导航页面">
+        <HTooltip
+          text="该功能开启时，登录成功默认进入主页，反之则默认进入导航栏里第一个导航页面"
+        >
           <SvgIcon name="i-ri:question-line" />
         </HTooltip>
       </div>
@@ -345,7 +404,9 @@ function handleCopy() {
     <div class="setting-item">
       <div class="label">
         动态标题
-        <HTooltip text="该功能开启时，页面标题会显示当前路由标题，格式为“页面标题 - 网站名称”；关闭时则显示网站名称，网站名称在项目根目录下 .env.* 文件里配置">
+        <HTooltip
+          text="该功能开启时，页面标题会显示当前路由标题，格式为“页面标题 - 网站名称”；关闭时则显示网站名称，网站名称在项目根目录下 .env.* 文件里配置"
+        >
           <SvgIcon name="i-ri:question-line" />
         </HTooltip>
       </div>
@@ -362,7 +423,9 @@ function handleCopy() {
 
 <style scoped>
 .divider {
-  --uno: flex items-center justify-between gap-4 my-4 whitespace-nowrap text-sm font-500;
+  --uno:
+    flex items-center justify-between gap-4 my-4 whitespace-nowrap text-sm
+    font-500;
 
   &::before,
   &::after {
@@ -374,7 +437,9 @@ function handleCopy() {
   --uno: flex items-center justify-center gap-4 pb-4;
 
   .mode {
-    --uno: relative w-16 h-12 rounded-2 ring-1 ring-stone-2 dark-ring-stone-7 cursor-pointer transition;
+    --uno:
+      relative w-16 h-12 rounded-2 ring-1 ring-stone-2 dark-ring-stone-7
+      cursor-pointer transition;
 
     &.active {
       --uno: ring-ui-primary ring-2;
@@ -436,14 +501,18 @@ function handleCopy() {
       }
 
       .mode-container {
-        --uno: inset-t-2 inset-r-2 inset-b-2 inset-l-5.5 rounded-tr-1 rounded-br-1;
+        --uno:
+          inset-t-2 inset-r-2 inset-b-2 inset-l-5.5 rounded-tr-1
+          rounded-br-1;
       }
     }
   }
 }
 
 .setting-item {
-  --uno: flex items-center justify-between gap-4 px-4 py-2 rounded-2 transition hover-bg-stone-1 dark-hover-bg-stone-9;
+  --uno:
+    flex items-center justify-between gap-4 px-4 py-2 rounded-2 transition
+    hover-bg-stone-1 dark-hover-bg-stone-9;
 
   .label {
     --uno: flex items-center flex-shrink-0 gap-2 text-sm;

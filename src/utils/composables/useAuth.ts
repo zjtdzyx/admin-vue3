@@ -19,7 +19,8 @@ export default function useAuth() {
       auth = value !== '' ? hasPermission(value) : true
     }
     else {
-      auth = value.length > 0 ? value.some(item => hasPermission(item)) : true
+      auth
+        = value.length > 0 ? value.some(item => hasPermission(item)) : true
     }
     return auth
   }

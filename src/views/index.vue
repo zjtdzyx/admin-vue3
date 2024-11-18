@@ -57,28 +57,35 @@ function open(url: string) {
     <PageHeader>
       <template #title>
         <div class="flex items-center gap-4">
-          欢迎使用 Fantastic-admin
+          欢迎来到嘉农公司信息管理系统
         </div>
       </template>
       <template #content>
         <div class="text-sm/6">
           <div>
-            这是一款<b class="text-emphasis">开箱即用</b>的中后台框架，同时它也经历过数十个真实项目的技术沉淀，确保框架在开发中可落地、可使用、可维护
+            这里是嘉农公司后台管理系统的主页，在这个页面中，我们会对这个系统的一些基本信息进行介绍，同时也会简要介绍一下我们项目的技术栈、基本功能、业务逻辑等。
           </div>
+
           <div>
-            注：在作者就职过的公司，本框架已在电商、直播、OA、ERP等多个不同领域的中后台系统中应用并稳定运行
+            注：我们团队的成员是张博闻、张岳平、张宇翔、李昊珉、陈彦伟，本系统于2024.11.18日开始开发，预计11.21号完成基本功能
           </div>
         </div>
       </template>
       <HButton outline @click="open('https://fantastic-admin.hurui.me')">
         <SvgIcon name="i-ri:file-text-line" />
-        开发文档
+        模版文档
       </HButton>
       <HDropdownMenu
         :items="[
           [
-            { label: 'Gitee', handle: () => open('https://gitee.com/fantastic-admin/basic') },
-            { label: 'Github', handle: () => open('https://github.com/fantastic-admin/basic') },
+            {
+              label: 'Gitee',
+              handle: () => open('https://gitee.com/yx_z04/jianong-admin'),
+            },
+            {
+              label: 'Github',
+              handle: () => open('https://github.com/zjtdzyx/jianong-admin'),
+            },
           ],
         ]"
       >
@@ -102,7 +109,9 @@ function open(url: string) {
             </div>
           </div>
           <div class="ml-auto">
-            <HButton @click="open('https://hooray.github.io/fantastic-startkit')">
+            <HButton
+              @click="open('https://hooray.github.io/fantastic-startkit')"
+            >
               访问官网
             </HButton>
           </div>
@@ -130,12 +139,33 @@ function open(url: string) {
             </HButton>
           </div>
         </template>
-        <ElCarousel trigger="click" indicator-position="none" :interval="5000" height="250px">
-          <ElCarouselItem v-for="(item, index) in fantasticAdminInfo.data" :key="item">
-            <ElImage :src="item" fit="cover" style="width: 100%; height: 250px; margin: auto; cursor: pointer;" @click="fantasticAdminInfo.imageVisible = true; fantasticAdminInfo.index = index" />
+        <ElCarousel
+          trigger="click"
+          indicator-position="none"
+          :interval="5000"
+          height="250px"
+        >
+          <ElCarouselItem
+            v-for="(item, index) in fantasticAdminInfo.data"
+            :key="item"
+          >
+            <ElImage
+              :src="item"
+              fit="cover"
+              style="width: 100%; height: 250px; margin: auto; cursor: pointer;"
+              @click="
+                fantasticAdminInfo.imageVisible = true;
+                fantasticAdminInfo.index = index;
+              "
+            />
           </ElCarouselItem>
         </ElCarousel>
-        <ElImageViewer v-if="fantasticAdminInfo.imageVisible" :url-list="fantasticAdminInfo.data" :initial-index="fantasticAdminInfo.index" @close="fantasticAdminInfo.imageVisible = false" />
+        <ElImageViewer
+          v-if="fantasticAdminInfo.imageVisible"
+          :url-list="fantasticAdminInfo.data"
+          :initial-index="fantasticAdminInfo.index"
+          @close="fantasticAdminInfo.imageVisible = false"
+        />
       </PageMain>
       <PageMain class="ecology">
         <template #title>
@@ -154,12 +184,33 @@ function open(url: string) {
             </HButton>
           </div>
         </template>
-        <ElCarousel trigger="click" indicator-position="none" :interval="5000" height="250px">
-          <ElCarouselItem v-for="(item, index) in oneStepAdminInfo.data" :key="item">
-            <ElImage :src="item" fit="cover" style="width: 100%; height: 250px; margin: auto; cursor: pointer;" @click="oneStepAdminInfo.imageVisible = true; oneStepAdminInfo.index = index" />
+        <ElCarousel
+          trigger="click"
+          indicator-position="none"
+          :interval="5000"
+          height="250px"
+        >
+          <ElCarouselItem
+            v-for="(item, index) in oneStepAdminInfo.data"
+            :key="item"
+          >
+            <ElImage
+              :src="item"
+              fit="cover"
+              style="width: 100%; height: 250px; margin: auto; cursor: pointer;"
+              @click="
+                oneStepAdminInfo.imageVisible = true;
+                oneStepAdminInfo.index = index;
+              "
+            />
           </ElCarouselItem>
         </ElCarousel>
-        <ElImageViewer v-if="oneStepAdminInfo.imageVisible" :url-list="oneStepAdminInfo.data" :initial-index="oneStepAdminInfo.index" @close="oneStepAdminInfo.imageVisible = false" />
+        <ElImageViewer
+          v-if="oneStepAdminInfo.imageVisible"
+          :url-list="oneStepAdminInfo.data"
+          :initial-index="oneStepAdminInfo.index"
+          @close="oneStepAdminInfo.imageVisible = false"
+        />
       </PageMain>
     </div>
   </div>

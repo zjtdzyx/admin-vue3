@@ -30,7 +30,9 @@ export interface MenuInjection {
   handleSubMenuClick: (index: string, indexPath: string[]) => void
 }
 
-export const rootMenuInjectionKey = Symbol('rootMenu') as InjectionKey<MenuInjection>
+export const rootMenuInjectionKey = Symbol(
+  'rootMenu',
+) as InjectionKey<MenuInjection>
 
 export interface SubMenuProps {
   uniqueKey: string[]

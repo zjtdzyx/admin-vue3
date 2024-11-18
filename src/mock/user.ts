@@ -31,9 +31,7 @@ export default defineFakeRoute([
         ]
       }
       else if (headers.token?.indexOf('test') === 0) {
-        permissions = [
-          'permission.browse',
-        ]
+        permissions = ['permission.browse']
       }
       return {
         error: '',

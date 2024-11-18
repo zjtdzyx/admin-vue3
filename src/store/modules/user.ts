@@ -24,10 +24,7 @@ const useUserStore = defineStore(
     })
 
     // 登录
-    async function login(data: {
-      account: string
-      password: string
-    }) {
+    async function login(data: { account: string, password: string }) {
       const res = await apiUser.login(data)
       localStorage.setItem('account', res.data.account)
       localStorage.setItem('token', res.data.token)
@@ -50,7 +47,8 @@ const useUserStore = defineStore(
       router.push({
         name: 'login',
         query: {
-          ...(redirect !== settingsStore.settings.home.fullPath && router.currentRoute.value.name !== 'login' && { redirect }),
+          ...(redirect !== settingsStore.settings.home.fullPath
+            && router.currentRoute.value.name !== 'login' && { redirect }),
         },
       })
     }

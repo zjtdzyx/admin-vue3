@@ -19,10 +19,13 @@ const props = withDefaults(
   },
 )
 
-const value = defineModel<string[] | {
-  code: string
-  name: string
-}[]>({
+const value = defineModel<
+  | string[]
+  | {
+    code: string
+    name: string
+  }[]
+>({
   default: [],
 })
 
@@ -106,7 +109,9 @@ function anyToCode(value: any[], dictionarie: any[] = pcasData.value) {
     })
     input.push(findItem.code)
     if (findItem.children) {
-      input.push(...anyToCode(value.slice(1 - value.length), findItem.children))
+      input.push(
+        ...anyToCode(value.slice(1 - value.length), findItem.children),
+      )
     }
   }
   return input
@@ -139,5 +144,12 @@ function codeToAny(codes: string[], dictionarie: any[] = pcasData.value): any {
 </script>
 
 <template>
-  <ElCascader v-model="myValue" :options="pcasData as any[]" :props="{ value: 'code', label: 'name' }" :disabled="disabled" clearable filterable />
+  <ElCascader
+    v-model="myValue"
+    :options="pcasData as any[]"
+    :props="{ value: 'code', label: 'name' }"
+    :disabled="disabled"
+    clearable
+    filterable
+  />
 </template>

@@ -1,0 +1,32 @@
+# 忽略 node_modules 目录
+node_modules/
+
+# 忽略构建输出目录
+dist/
+build/
+
+# 忽略公共资源目录
+public/
+
+# 忽略环境配置文件
+.env
+.env.*.local
+
+# 忽略日志文件
+*.log
+
+# 忽略其他不必要的文件和目录
+coverage/
+*.min.js
+*.bundle.js
+*.map
+
+# 忽略 IDE 和编辑器配置文件
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# 忽略操作系统生成的文件
+.DS_Store
+Thumbs.db

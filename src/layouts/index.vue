@@ -30,8 +30,16 @@ const menu = useMenu()
 
 // 侧边栏主导航当前实际宽度
 const mainSidebarActualWidth = computed(() => {
-  let actualWidth = Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--g-main-sidebar-width'))
-  if (settingsStore.settings.menu.mode === 'single' || (settingsStore.settings.menu.mode === 'head' && settingsStore.mode !== 'mobile')) {
+  let actualWidth = Number.parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      '--g-main-sidebar-width',
+    ),
+  )
+  if (
+    settingsStore.settings.menu.mode === 'single'
+    || (settingsStore.settings.menu.mode === 'head'
+      && settingsStore.mode !== 'mobile')
+  ) {
     actualWidth = 0
   }
   return `${actualWidth}px`
@@ -39,9 +47,20 @@ const mainSidebarActualWidth = computed(() => {
 
 // 侧边栏次导航当前实际宽度
 const subSidebarActualWidth = computed(() => {
-  let actualWidth = Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--g-sub-sidebar-width'))
-  if (settingsStore.settings.menu.subMenuCollapse && settingsStore.mode !== 'mobile') {
-    actualWidth = Number.parseInt(getComputedStyle(document.documentElement).getPropertyValue('--g-sub-sidebar-collapse-width'))
+  let actualWidth = Number.parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue(
+      '--g-sub-sidebar-width',
+    ),
+  )
+  if (
+    settingsStore.settings.menu.subMenuCollapse
+    && settingsStore.mode !== 'mobile'
+  ) {
+    actualWidth = Number.parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        '--g-sub-sidebar-collapse-width',
+      ),
+    )
   }
   if (menuStore.sidebarMenus.every(item => item.meta?.menu === false)) {
     actualWidth = 0
@@ -51,24 +70,30 @@ const subSidebarActualWidth = computed(() => {
 
 const isLink = computed(() => !!routeInfo.meta.link)
 
-watch(() => settingsStore.settings.menu.subMenuCollapse, (val) => {
-  if (settingsStore.mode === 'mobile') {
-    if (!val) {
-      document.body.classList.add('overflow-hidden')
+watch(
+  () => settingsStore.settings.menu.subMenuCollapse,
+  (val) => {
+    if (settingsStore.mode === 'mobile') {
+      if (!val) {
+        document.body.classList.add('overflow-hidden')
+      }
+      else {
+        document.body.classList.remove('overflow-hidden')
+      }
     }
-    else {
-      document.body.classList.remove('overflow-hidden')
-    }
-  }
-})
+  },
+)
 
-watch(() => routeInfo.path, () => {
-  if (settingsStore.mode === 'mobile') {
-    settingsStore.$patch((state) => {
-      state.settings.menu.subMenuCollapse = true
-    })
-  }
-})
+watch(
+  () => routeInfo.path,
+  () => {
+    if (settingsStore.mode === 'mobile') {
+      settingsStore.$patch((state) => {
+        state.settings.menu.subMenuCollapse = true
+      })
+    }
+  },
+)
 
 onMounted(() => {
   hotkeys('f5', (e) => {
@@ -80,7 +105,11 @@ onMounted(() => {
   hotkeys('alt+`', (e) => {
     if (settingsStore.settings.menu.enableHotkeys) {
       e.preventDefault()
-      menu.switchTo(menuStore.actived + 1 < menuStore.allMenus.length ? menuStore.actived + 1 : 0)
+      menu.switchTo(
+        menuStore.actived + 1 < menuStore.allMenus.length
+          ? menuStore.actived + 1
+          : 0,
+      )
     }
   })
 })
@@ -94,7 +123,8 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
 
 <template>
   <div
-    class="layout" :style="{
+    class="layout"
+    :style="{
       '--g-main-sidebar-actual-width': mainSidebarActualWidth,
       '--g-sub-sidebar-actual-width': subSidebarActualWidth,
     }"
@@ -102,18 +132,37 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
     <div id="app-main">
       <Header />
       <div class="wrapper">
-        <div class="sidebar-container" :class="{ show: settingsStore.mode === 'mobile' && !settingsStore.settings.menu.subMenuCollapse }">
+        <div
+          class="sidebar-container"
+          :class="{
+            show:
+              settingsStore.mode === 'mobile'
+              && !settingsStore.settings.menu.subMenuCollapse,
+          }"
+        >
           <MainSidebar />
           <SubSidebar />
         </div>
-        <div class="sidebar-mask" :class="{ show: settingsStore.mode === 'mobile' && !settingsStore.settings.menu.subMenuCollapse }" @click="settingsStore.toggleSidebarCollapse()" />
+        <div
+          class="sidebar-mask"
+          :class="{
+            show:
+              settingsStore.mode === 'mobile'
+              && !settingsStore.settings.menu.subMenuCollapse,
+          }"
+          @click="settingsStore.toggleSidebarCollapse()"
+        />
         <div class="main-container">
           <Topbar />
           <div class="main">
             <RouterView v-slot="{ Component, route }">
               <Transition name="slide-right" mode="out-in">
                 <KeepAlive :include="keepAliveStore.list">
-                  <component :is="Component" v-show="!isLink" :key="route.fullPath" />
+                  <component
+                    :is="Component"
+                    v-show="!isLink"
+                    :key="route.fullPath"
+                  />
                 </KeepAlive>
               </Transition>
             </RouterView>
@@ -126,7 +175,10 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
     <Search />
     <HotkeysIntro />
     <template v-if="enableAppSetting">
-      <div class="app-setting" @click="eventBus.emit('global-app-setting-toggle')">
+      <div
+        class="app-setting"
+        @click="eventBus.emit('global-app-setting-toggle')"
+      >
         <SvgIcon name="i-uiw:setting-o" class="icon" />
       </div>
       <AppSetting />
@@ -138,7 +190,10 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
 <style scoped>
 [data-mode="mobile"] {
   .sidebar-container {
-    transform: translateX(calc((var(--g-main-sidebar-width) + var(--g-sub-sidebar-width)) * -1));
+    transform:
+      translateX(
+        calc((var(--g-main-sidebar-width) + var(--g-sub-sidebar-width)) * -1)
+      );
 
     &.show {
       transform: translateX(0);
@@ -182,9 +237,18 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
     bottom: 0;
     z-index: 1010;
     display: flex;
-    width: calc(var(--g-main-sidebar-actual-width) + var(--g-sub-sidebar-actual-width));
-    box-shadow: -1px 0 0 0 var(--g-border-color), 1px 0 0 0 var(--g-border-color);
-    transition: width 0.3s, transform 0.3s, box-shadow 0.3s, top 0.3s;
+    width:
+      calc(
+        var(--g-main-sidebar-actual-width) + var(--g-sub-sidebar-actual-width)
+      );
+    box-shadow:
+      -1px 0 0 0 var(--g-border-color),
+      1px 0 0 0 var(--g-border-color);
+    transition:
+      width 0.3s,
+      transform 0.3s,
+      box-shadow 0.3s,
+      top 0.3s;
 
     &:has(> .main-sidebar-container.main-sidebar-enter-active),
     &:has(> .main-sidebar-container.main-sidebar-leave-active) {
@@ -220,10 +284,18 @@ const enableAppSetting = import.meta.env.VITE_APP_SETTING === 'true'
     display: flex;
     flex-direction: column;
     min-height: 100%;
-    margin-left: calc(var(--g-main-sidebar-actual-width) + var(--g-sub-sidebar-actual-width));
+    margin-left:
+      calc(
+        var(--g-main-sidebar-actual-width) + var(--g-sub-sidebar-actual-width)
+      );
     background-color: var(--g-bg);
-    box-shadow: -1px 0 0 0 var(--g-border-color), 1px 0 0 0 var(--g-border-color);
-    transition: margin-left 0.3s, background-color 0.3s, box-shadow 0.3s;
+    box-shadow:
+      -1px 0 0 0 var(--g-border-color),
+      1px 0 0 0 var(--g-border-color);
+    transition:
+      margin-left 0.3s,
+      background-color 0.3s,
+      box-shadow 0.3s;
 
     .main {
       position: relative;

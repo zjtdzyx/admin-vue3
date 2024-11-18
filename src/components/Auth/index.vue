@@ -12,7 +12,9 @@ const auth = useAuth()
 
 function check() {
   return props.all
-    ? auth.authAll(typeof props.value === 'string' ? [props.value] : props.value)
+    ? auth.authAll(
+      typeof props.value === 'string' ? [props.value] : props.value,
+    )
     : auth.auth(props.value)
 }
 </script>

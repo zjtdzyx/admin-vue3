@@ -36,9 +36,23 @@ function pathCompile(path: string) {
 </script>
 
 <template>
-  <Breadcrumb v-if="settingsStore.mode === 'pc' && settingsStore.settings.app.routeBaseOn !== 'filesystem'" class="breadcrumb whitespace-nowrap px-2">
+  <Breadcrumb
+    v-if="
+      settingsStore.mode === 'pc'
+        && settingsStore.settings.app.routeBaseOn !== 'filesystem'
+    "
+    class="breadcrumb whitespace-nowrap px-2"
+  >
     <TransitionGroup name="breadcrumb">
-      <BreadcrumbItem v-for="(item, index) in breadcrumbList" :key="`${index}_${item.path}_${item.title}`" :to="index < breadcrumbList.length - 1 && item.path !== '' ? pathCompile(item.path) : ''">
+      <BreadcrumbItem
+        v-for="(item, index) in breadcrumbList"
+        :key="`${index}_${item.path}_${item.title}`"
+        :to="
+          index < breadcrumbList.length - 1 && item.path !== ''
+            ? pathCompile(item.path)
+            : ''
+        "
+      >
         {{ item.title }}
       </BreadcrumbItem>
     </TransitionGroup>
@@ -48,7 +62,9 @@ function pathCompile(path: string) {
 <style scoped>
 /* 面包屑动画 */
 .breadcrumb-enter-active {
-  transition: transform 0.3s, opacity 0.3s;
+  transition:
+    transform 0.3s,
+    opacity 0.3s;
 }
 
 .breadcrumb-enter-from {

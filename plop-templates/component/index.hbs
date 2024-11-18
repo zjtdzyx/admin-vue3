@@ -1,9 +1,7 @@
-<script setup lang="ts">
-{{#if isGlobal}}
-defineOptions({
-  name: '{{ properCase name }}',
-})
-{{/if}}
+<script setup lang='ts'>
+  {{#if isGlobal}}
+    defineOptions({ name: '{{properCase name}}', })
+  {{/if}}
 </script>
 
 <template>
@@ -13,5 +11,5 @@ defineOptions({
 </template>
 
 <style scoped>
-/* 样式 */
+  /* 样式 */
 </style>

@@ -20,16 +20,21 @@ const useMenuStore = defineStore(
     const actived = ref(0)
 
     // 将原始路由转换成导航菜单
-    function convertRouteToMenu(routes: Route.recordMainRaw[]): Menu.recordMainRaw[] {
+    function convertRouteToMenu(
+      routes: Route.recordMainRaw[],
+    ): Menu.recordMainRaw[] {
       const returnMenus: Menu.recordMainRaw[] = []
       routes.forEach((item) => {
         if (item.children.length > 0) {
           if (settingsStore.settings.menu.mode === 'single') {
-            returnMenus.length === 0 && returnMenus.push({
+            returnMenus.length === 0
+            && returnMenus.push({
               meta: {},
               children: [],
             })
-            returnMenus[0].children.push(...convertRouteToMenuRecursive(item.children))
+            returnMenus[0].children.push(
+              ...convertRouteToMenuRecursive(item.children),
+            )
           }
           else {
             const menuItem: Menu.recordMainRaw = {
@@ -47,7 +52,10 @@ const useMenuStore = defineStore(
       })
       return returnMenus
     }
-    function convertRouteToMenuRecursive(routes: RouteRecordRaw[], basePath = ''): Menu.recordRaw[] {
+    function convertRouteToMenuRecursive(
+      routes: RouteRecordRaw[],
+      basePath = '',
+    ): Menu.recordRaw[] {
       const returnMenus: Menu.recordRaw[] = []
       routes.forEach((item) => {
         const menuItem: Menu.recordRaw = {
@@ -62,7 +70,10 @@ const useMenuStore = defineStore(
           },
         }
         if (item.children) {
-          menuItem.children = convertRouteToMenuRecursive(item.children, menuItem.path)
+          menuItem.children = convertRouteToMenuRecursive(
+            item.children,
+            menuItem.path,
+          )
         }
         returnMenus.push(menuItem)
       })
@@ -103,10 +114,16 @@ const useMenuStore = defineStore(
       if (menu.children) {
         const item = menu.children.find(item => item.meta?.menu !== false)
         if (item) {
-          retnPath = getDeepestPath(item, resolveRoutePath(rootPath, menu.path))
+          retnPath = getDeepestPath(
+            item,
+            resolveRoutePath(rootPath, menu.path),
+          )
         }
         else {
-          retnPath = getDeepestPath(menu.children[0], resolveRoutePath(rootPath, menu.path))
+          retnPath = getDeepestPath(
+            menu.children[0],
+            resolveRoutePath(rootPath, menu.path),
+          )
         }
       }
       else {
@@ -129,7 +146,10 @@ const useMenuStore = defineStore(
       menus.forEach((item) => {
         if (item.meta?.defaultOpened && item.children) {
           defaultOpenedPaths.push(resolveRoutePath(rootPath, item.path))
-          const childrenDefaultOpenedPaths = getDefaultOpenedPaths(item.children, resolveRoutePath(rootPath, item.path))
+          const childrenDefaultOpenedPaths = getDefaultOpenedPaths(
+            item.children,
+            resolveRoutePath(rootPath, item.path),
+          )
           if (childrenDefaultOpenedPaths.length > 0) {
             defaultOpenedPaths.push(...childrenDefaultOpenedPaths)
           }
@@ -139,7 +159,10 @@ const useMenuStore = defineStore(
     }
 
     // 判断是否有权限
-    function hasPermission(permissions: string[], menu: Menu.recordMainRaw | Menu.recordRaw) {
+    function hasPermission(
+      permissions: string[],
+      menu: Menu.recordMainRaw | Menu.recordRaw,
+    ) {
       let isAuth = false
       if (menu.meta?.auth) {
         isAuth = permissions.some((auth) => {
@@ -147,7 +170,9 @@ const useMenuStore = defineStore(
             return menu.meta.auth !== '' ? menu.meta.auth === auth : true
           }
           else if (typeof menu.meta?.auth === 'object') {
-            return menu.meta.auth.length > 0 ? menu.meta.auth.includes(auth) : true
+            return menu.meta.auth.length > 0
+              ? menu.meta.auth.includes(auth)
+              : true
           }
           else {
             return false
@@ -160,13 +185,18 @@ const useMenuStore = defineStore(
       return isAuth
     }
     // 根据权限过滤导航
-    function filterAsyncMenus<T extends Menu.recordMainRaw[] | Menu.recordRaw[]>(menus: T, permissions: string[]): T {
+    function filterAsyncMenus<
+      T extends Menu.recordMainRaw[] | Menu.recordRaw[],
+    >(menus: T, permissions: string[]): T {
       const res: any = []
       menus.forEach((menu) => {
         if (hasPermission(permissions, menu)) {
           const tmpMenu = cloneDeep(menu)
           if (tmpMenu.children && tmpMenu.children.length > 0) {
-            tmpMenu.children = filterAsyncMenus(tmpMenu.children, permissions) as Menu.recordRaw[]
+            tmpMenu.children = filterAsyncMenus(
+              tmpMenu.children,
+              permissions,
+            ) as Menu.recordRaw[]
             tmpMenu.children.length > 0 && res.push(tmpMenu)
           }
           else {
@@ -179,13 +209,20 @@ const useMenuStore = defineStore(
     }
     // 生成导航（前端生成）
     async function generateMenusAtFront() {
-      filesystemMenusRaw.value = menu.filter(item => item.children.length !== 0)
+      filesystemMenusRaw.value = menu.filter(
+        item => item.children.length !== 0,
+      )
     }
     // 生成导航（后端生成）
     async function generateMenusAtBack() {
-      await apiApp.menuList().then(async (res) => {
-        filesystemMenusRaw.value = (res.data as Menu.recordMainRaw[]).filter(item => item.children.length !== 0)
-      }).catch(() => {})
+      await apiApp
+        .menuList()
+        .then(async (res) => {
+          filesystemMenusRaw.value = (res.data as Menu.recordMainRaw[]).filter(
+            item => item.children.length !== 0,
+          )
+        })
+        .catch(() => {})
     }
     // 设置主导航
     function isPathInMenus(menus: Menu.recordRaw[], path: string) {
@@ -205,7 +242,9 @@ const useMenuStore = defineStore(
       }
       else {
         // 如果是 string 类型，则认为是路由，需要查找对应的主导航索引
-        const findIndex = allMenus.value.findIndex(item => isPathInMenus(item.children, data))
+        const findIndex = allMenus.value.findIndex(item =>
+          isPathInMenus(item.children, data),
+        )
         if (findIndex >= 0) {
           actived.value = findIndex
         }

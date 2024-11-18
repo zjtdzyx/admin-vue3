@@ -17,7 +17,9 @@ const route = useRoute()
 const router = useRouter()
 const settingsStore = useSettingsStore()
 
-const redirect = ref(route.query.redirect?.toString() ?? settingsStore.settings.home.fullPath)
+const redirect = ref(
+  route.query.redirect?.toString() ?? settingsStore.settings.home.fullPath,
+)
 const account = ref<string>()
 // 表单类型
 const formType = ref<'login' | 'register' | 'resetPassword'>('login')
@@ -27,7 +29,10 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
   <div class="bg-banner" />
   <div class="login-box">
     <div class="login-banner">
-      <img src="@/assets/images/logo.png" class="absolute left-4 top-4 h-30px rounded ring ring-stone-2 dark-ring-stone-8">
+      <img
+        src="@/assets/images/logo.png"
+        class="absolute left-4 top-4 h-30px rounded ring ring-stone-2 dark-ring-stone-8"
+      >
       <img src="@/assets/images/login-banner.png" class="banner">
     </div>
     <div class="login-form flex-col-center">
@@ -36,19 +41,39 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
           v-if="formType === 'login'"
           :account
           @on-login="router.push(redirect)"
-          @on-register="(account) => { formType = 'register'; account = account }"
-          @on-reset-password="(account) => { formType = 'resetPassword'; account = account }"
+          @on-register="
+            (account) => {
+              formType = 'register';
+              account = account;
+            }
+          "
+          @on-reset-password="
+            (account) => {
+              formType = 'resetPassword';
+              account = account;
+            }
+          "
         />
         <RegisterForm
           v-else-if="formType === 'register'"
           :account
-          @on-register="(account) => { formType = 'login'; account = account }"
+          @on-register="
+            (account) => {
+              formType = 'login';
+              account = account;
+            }
+          "
           @on-login="formType = 'login'"
         />
         <ResetPasswordForm
           v-else-if="formType === 'resetPassword'"
           :account
-          @on-reset-password="(account) => { formType = 'login'; account = account }"
+          @on-reset-password="
+            (account) => {
+              formType = 'login';
+              account = account;
+            }
+          "
           @on-login="formType = 'login'"
         />
       </Transition>
@@ -63,7 +88,12 @@ const formType = ref<'login' | 'register' | 'resetPassword'>('login')
   z-index: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, var(--g-container-bg), var(--g-bg));
+  background:
+    radial-gradient(
+      circle at center,
+      var(--g-container-bg),
+      var(--g-bg)
+    );
 }
 
 [data-mode="mobile"] {

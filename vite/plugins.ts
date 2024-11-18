@@ -27,10 +27,7 @@ export default function createVitePlugins(mode: string, isBuild = false) {
     vueJsx(),
     vueLegacy({
       renderLegacyChunks: false,
-      modernPolyfills: [
-        'es.array.at',
-        'es.array.find-last',
-      ],
+      modernPolyfills: ['es.array.at', 'es.array.find-last'],
     }),
 
     // https://github.com/vuejs/devtools-next
@@ -38,23 +35,14 @@ export default function createVitePlugins(mode: string, isBuild = false) {
 
     // https://github.com/unplugin/unplugin-auto-import
     autoImport({
-      imports: [
-        'vue',
-        'vue-router',
-        'pinia',
-      ],
+      imports: ['vue', 'vue-router', 'pinia'],
       dts: './src/types/auto-imports.d.ts',
-      dirs: [
-        './src/utils/composables/**',
-      ],
+      dirs: ['./src/utils/composables/**'],
     }),
 
     // https://github.com/unplugin/unplugin-vue-components
     components({
-      dirs: [
-        'src/components',
-        'src/layouts/ui-kit',
-      ],
+      dirs: ['src/components', 'src/layouts/ui-kit'],
       include: [/\.vue$/, /\.vue\?vue/, /\.tsx$/],
       dts: './src/types/components.d.ts',
     }),
@@ -84,19 +72,19 @@ export default function createVitePlugins(mode: string, isBuild = false) {
     // https://github.com/hannoeru/vite-plugin-pages
     Pages({
       dirs: 'src/views',
-      exclude: [
-        '**/components/**/*.vue',
-      ],
+      exclude: ['**/components/**/*.vue'],
     }),
 
     // https://github.com/nonzzz/vite-plugin-compression
     viteEnv.VITE_BUILD_COMPRESS?.split(',').includes('gzip') && compression(),
-    viteEnv.VITE_BUILD_COMPRESS?.split(',').includes('brotli') && compression({
+    viteEnv.VITE_BUILD_COMPRESS?.split(',').includes('brotli')
+    && compression({
       exclude: [/\.(br)$/, /\.(gz)$/],
       algorithm: 'brotliCompress',
     }),
 
-    viteEnv.VITE_BUILD_ARCHIVE && Archiver({
+    viteEnv.VITE_BUILD_ARCHIVE
+    && Archiver({
       archiveType: viteEnv.VITE_BUILD_ARCHIVE,
     }),
 

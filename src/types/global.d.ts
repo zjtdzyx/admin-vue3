@@ -1,10 +1,10 @@
 import type { RouteRecordRaw } from 'vue-router'
 
 type RecursiveRequired<T> = {
-  [P in keyof T]-?: RecursiveRequired<T[P]>
+  [P in keyof T]-?: RecursiveRequired<T[P]>;
 }
 type RecursivePartial<T> = {
-  [P in keyof T]?: RecursivePartial<T[P]>
+  [P in keyof T]?: RecursivePartial<T[P]>;
 }
 
 declare namespace Settings {

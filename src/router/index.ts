@@ -9,7 +9,10 @@ import { constantRoutes, constantRoutesByFilesystem } from './routes'
 
 const router = createRouter({
   history: createWebHashHistory(),
-  routes: useSettingsStore(pinia).settings.app.routeBaseOn === 'filesystem' ? constantRoutesByFilesystem : constantRoutes,
+  routes:
+    useSettingsStore(pinia).settings.app.routeBaseOn === 'filesystem'
+      ? constantRoutesByFilesystem
+      : constantRoutes,
 })
 
 setupGuards(router)

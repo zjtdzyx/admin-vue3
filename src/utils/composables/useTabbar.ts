@@ -39,7 +39,9 @@ export default function useTabbar() {
       if (tabbarStore.list.length > 1) {
         // 如果关闭的标签正好是当前路由
         if (tabId === activedTabId) {
-          const index = tabbarStore.list.findIndex(item => item.tabId === tabId)
+          const index = tabbarStore.list.findIndex(
+            item => item.tabId === tabId,
+          )
           if (index < tabbarStore.list.length - 1) {
             close(tabbarStore.list[index + 1].fullPath)
           }
@@ -85,7 +87,9 @@ export default function useTabbar() {
     // 如果操作的是非当前路由标签页，需要判断当前标签页是否在指定标签页左侧，如果是则先跳转到指定路由标签页
     if (tabId !== activedTabId) {
       const index = tabbarStore.list.findIndex(item => item.tabId === tabId)
-      const activedIndex = tabbarStore.list.findIndex(item => item.tabId === activedTabId)
+      const activedIndex = tabbarStore.list.findIndex(
+        item => item.tabId === activedTabId,
+      )
       if (activedIndex < index) {
         router.push(tabbarStore.list[index].fullPath)
       }
@@ -101,7 +105,9 @@ export default function useTabbar() {
     // 如果操作的是非当前路由标签页，需要判断当前标签页是否在指定标签页右侧，如果是则先跳转到指定路由标签页
     if (tabId !== activedTabId) {
       const index = tabbarStore.list.findIndex(item => item.tabId === tabId)
-      const activedIndex = tabbarStore.list.findIndex(item => item.tabId === activedTabId)
+      const activedIndex = tabbarStore.list.findIndex(
+        item => item.tabId === activedTabId,
+      )
       if (activedIndex > index) {
         router.push(tabbarStore.list[index].fullPath)
       }

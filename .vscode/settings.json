@@ -7,12 +7,7 @@
     "source.fixAll.stylelint": "explicit",
     "source.organizeImports": "never"
   },
-  "stylelint.validate": [
-    "css",
-    "postcss",
-    "scss",
-    "vue"
-  ],
+  "stylelint.validate": ["css", "postcss", "scss", "vue"],
   "eslint.validate": [
     "javascript",
     "javascriptreact",

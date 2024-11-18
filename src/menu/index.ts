@@ -8,9 +8,7 @@ const menu: Menu.recordMainRaw[] = [
       title: '演示',
       icon: 'uim:box',
     },
-    children: [
-      MultilevelMenuExample,
-    ],
+    children: [MultilevelMenuExample],
   },
 ]
 

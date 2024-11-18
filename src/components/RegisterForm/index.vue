@@ -25,12 +25,8 @@ const form = ref({
   checkPassword: '',
 })
 const rules = ref<FormRules>({
-  account: [
-    { required: true, trigger: 'blur', message: '请输入用户名' },
-  ],
-  captcha: [
-    { required: true, trigger: 'blur', message: () => '请输入验证码' },
-  ],
+  account: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
+  captcha: [{ required: true, trigger: 'blur', message: () => '请输入验证码' }],
   password: [
     { required: true, trigger: 'blur', message: '请输入密码' },
     { min: 6, max: 18, trigger: 'blur', message: '密码长度为6到18位' },
@@ -64,20 +60,35 @@ function handleRegister() {
 </script>
 
 <template>
-  <ElForm ref="formRef" :model="form" :rules="rules" class="min-h-500px w-full flex-col-stretch-center p-12">
+  <ElForm
+    ref="formRef"
+    :model="form"
+    :rules="rules"
+    class="min-h-500px w-full flex-col-stretch-center p-12"
+  >
     <h3 class="mb-8 text-xl color-[var(--el-text-color-primary)] font-bold">
       探索从这里开始! 🚀
     </h3>
     <div>
       <ElFormItem prop="account">
-        <ElInput v-model="form.account" size="large" placeholder="用户名" tabindex="1">
+        <ElInput
+          v-model="form.account"
+          size="large"
+          placeholder="用户名"
+          tabindex="1"
+        >
           <template #prefix>
             <SvgIcon name="i-ri:user-3-fill" />
           </template>
         </ElInput>
       </ElFormItem>
       <ElFormItem prop="captcha">
-        <ElInput v-model="form.captcha" size="large" placeholder="验证码" tabindex="2">
+        <ElInput
+          v-model="form.captcha"
+          size="large"
+          placeholder="验证码"
+          tabindex="2"
+        >
           <template #prefix>
             <SvgIcon name="i-ic:baseline-verified-user" />
           </template>
@@ -87,26 +98,52 @@ function handleRegister() {
         </ElInput>
       </ElFormItem>
       <ElFormItem prop="password">
-        <ElInput v-model="form.password" type="password" size="large" placeholder="密码" tabindex="3" show-password>
+        <ElInput
+          v-model="form.password"
+          type="password"
+          size="large"
+          placeholder="密码"
+          tabindex="3"
+          show-password
+        >
           <template #prefix>
             <SvgIcon name="i-ri:lock-2-fill" />
           </template>
         </ElInput>
       </ElFormItem>
       <ElFormItem prop="checkPassword">
-        <ElInput v-model="form.checkPassword" type="password" size="large" placeholder="确认密码" tabindex="4" show-password>
+        <ElInput
+          v-model="form.checkPassword"
+          type="password"
+          size="large"
+          placeholder="确认密码"
+          tabindex="4"
+          show-password
+        >
           <template #prefix>
             <SvgIcon name="i-ri:lock-2-fill" />
           </template>
         </ElInput>
       </ElFormItem>
     </div>
-    <ElButton :loading="loading" type="primary" size="large" style="width: 100%; margin-top: 20px;" @click.prevent="handleRegister">
+    <ElButton
+      :loading="loading"
+      type="primary"
+      size="large"
+      style="width: 100%; margin-top: 20px;"
+      @click.prevent="handleRegister"
+    >
       注册
     </ElButton>
-    <div class="mt-4 flex-center gap-2 text-sm color-[var(--el-text-color-secondary)]">
+    <div
+      class="mt-4 flex-center gap-2 text-sm color-[var(--el-text-color-secondary)]"
+    >
       已经有帐号?
-      <ElLink type="primary" :underline="false" @click="emits('onLogin', form.account)">
+      <ElLink
+        type="primary"
+        :underline="false"
+        @click="emits('onLogin', form.account)"
+      >
         去登录
       </ElLink>
     </div>

@@ -18,7 +18,11 @@ const outputType = computed(() => {
   const hasPathFeatures = (str: string) => {
     return /^\.{1,2}\//.test(str) || str.startsWith('/') || str.includes('/')
   }
-  if (/^https?:\/\//.test(props.name) || hasPathFeatures(props.name) || !props.name) {
+  if (
+    /^https?:\/\//.test(props.name)
+    || hasPathFeatures(props.name)
+    || !props.name
+  ) {
     return 'img'
   }
   else if (/i-[^:]+:[^:]+/.test(props.name)) {
@@ -53,20 +57,33 @@ const style = computed(() => {
   }
   return {
     ...(props.color && { color: props.color }),
-    ...(props.size && { fontSize: typeof props.size === 'number' ? `${props.size}px` : props.size }),
+    ...(props.size && {
+      fontSize: typeof props.size === 'number' ? `${props.size}px` : props.size,
+    }),
     ...(transform.length && { transform: transform.join(' ') }),
   }
 })
 </script>
 
 <template>
-  <i class="relative h-[1em] w-[1em] flex-inline items-center justify-center fill-current leading-[1em]" :style="style">
+  <i
+    class="relative h-[1em] w-[1em] flex-inline items-center justify-center fill-current leading-[1em]"
+    :style="style"
+  >
     <i v-if="outputType === 'unocss'" class="h-[1em] w-[1em]" :class="name" />
     <Icon v-else-if="outputType === 'iconify'" :icon="name" />
-    <svg v-else-if="outputType === 'svg'" class="h-[1em] w-[1em]" aria-hidden="true">
+    <svg
+      v-else-if="outputType === 'svg'"
+      class="h-[1em] w-[1em]"
+      aria-hidden="true"
+    >
       <use :xlink:href="`#icon-${name}`" />
     </svg>
-    <UseImage v-else-if="outputType === 'img'" :src="name" class="h-[1em] w-[1em]">
+    <UseImage
+      v-else-if="outputType === 'img'"
+      :src="name"
+      class="h-[1em] w-[1em]"
+    >
       <template #loading>
         <i class="i-line-md:loading-loop h-[1em] w-[1em]" />
       </template>

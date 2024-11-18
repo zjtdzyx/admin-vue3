@@ -100,8 +100,15 @@ body {
   position: fixed;
   right: 0;
   left: 50%;
-  width: calc(100% - var(--g-main-sidebar-actual-width) - var(--g-sub-sidebar-actual-width));
-  transform: translateX(-50%) translateX(calc(var(--g-main-sidebar-actual-width) / 2)) translateX(calc(var(--g-sub-sidebar-actual-width) / 2));
+  width:
+    calc(
+      100% - var(--g-main-sidebar-actual-width)
+      var(--g-sub-sidebar-actual-width)
+    );
+  transform:
+    translateX(-50%)
+    translateX(calc(var(--g-main-sidebar-actual-width) / 2))
+    translateX(calc(var(--g-sub-sidebar-actual-width) / 2));
 
   [data-mode="mobile"] & {
     width: 100% !important;
@@ -122,7 +129,10 @@ textarea {
 
 .v-popper--theme-dropdown .v-popper__inner,
 .v-popper--theme-tooltip .v-popper__inner {
-  --uno: bg-white dark-bg-stone-8 text-dark dark-text-white rounded shadow ring-1 ring-gray-200 dark-ring-gray-800 border border-solid border-stone/20 text-xs font-normal;
+  --uno:
+    bg-white dark-bg-stone-8 text-dark dark-text-white rounded shadow
+    ring-1 ring-gray-200 dark-ring-gray-800 border border-solid border-stone/20
+    text-xs font-normal;
 
   box-shadow: 0 6px 30px rgb(0 0 0 / 10%);
 }

@@ -26,62 +26,94 @@ function onSidebarScroll() {
 }
 
 const enableSidebar = computed(() => {
-  return settingsStore.mode === 'mobile' || (
-    menuStore.sidebarMenus.length !== 0
-    && !menuStore.sidebarMenus.every(item => item.meta?.menu === false)
+  return (
+    settingsStore.mode === 'mobile'
+    || (menuStore.sidebarMenus.length !== 0
+      && !menuStore.sidebarMenus.every(item => item.meta?.menu === false))
   )
 })
 
-watch(enableSidebar, (val) => {
-  if (val) {
-    nextTick(() => {
-      onSidebarScroll()
-    })
-  }
-}, {
-  immediate: true,
-})
+watch(
+  enableSidebar,
+  (val) => {
+    if (val) {
+      nextTick(() => {
+        onSidebarScroll()
+      })
+    }
+  },
+  {
+    immediate: true,
+  },
+)
 
 const menuRef = useTemplateRef('menuRef')
 
 onMounted(() => {
   if (enableSidebar.value) {
     const { height } = useElementSize(menuRef)
-    watch(() => height.value, () => {
-      if (height.value > 0) {
-        onSidebarScroll()
-      }
-    }, {
-      immediate: true,
-    })
+    watch(
+      () => height.value,
+      () => {
+        if (height.value > 0) {
+          onSidebarScroll()
+        }
+      },
+      {
+        immediate: true,
+      },
+    )
   }
 })
 </script>
 
 <template>
   <div
-    v-if="enableSidebar" class="sub-sidebar-container" :class="{
-      'is-collapse': settingsStore.mode === 'pc' && settingsStore.settings.menu.subMenuCollapse,
+    v-if="enableSidebar"
+    class="sub-sidebar-container"
+    :class="{
+      'is-collapse':
+        settingsStore.mode === 'pc'
+        && settingsStore.settings.menu.subMenuCollapse,
     }"
   >
     <Logo
-      :show-logo="settingsStore.settings.menu.mode === 'single'" class="sidebar-logo" :class="{
+      :show-logo="settingsStore.settings.menu.mode === 'single'"
+      class="sidebar-logo"
+      :class="{
         'sidebar-logo-bg': settingsStore.settings.menu.mode === 'single',
       }"
     />
     <div
-      ref="subSidebarRef" class="sub-sidebar flex-1 transition-shadow-300 scrollbar-none" :class="{
+      ref="subSidebarRef"
+      class="sub-sidebar flex-1 transition-shadow-300 scrollbar-none"
+      :class="{
         'shadow-top': showShadowTop,
         'shadow-bottom': showShadowBottom,
-      }" @scroll="onSidebarScroll"
+      }"
+      @scroll="onSidebarScroll"
     >
       <div ref="menuRef">
         <TransitionGroup name="sub-sidebar">
-          <template v-for="(mainItem, mainIndex) in menuStore.allMenus" :key="mainIndex">
+          <template
+            v-for="(mainItem, mainIndex) in menuStore.allMenus"
+            :key="mainIndex"
+          >
             <div v-show="mainIndex === menuStore.actived">
               <Menu
-                :menu="mainItem.children" :value="route.meta.activeMenu || route.path" :default-openeds="menuStore.defaultOpenedPaths" :accordion="settingsStore.settings.menu.subMenuUniqueOpened" :collapse="settingsStore.mode === 'pc' && settingsStore.settings.menu.subMenuCollapse" class="menu" :class="{
-                  '-mt-2': !['head', 'single'].includes(settingsStore.settings.menu.mode),
+                :menu="mainItem.children"
+                :value="route.meta.activeMenu || route.path"
+                :default-openeds="menuStore.defaultOpenedPaths"
+                :accordion="settingsStore.settings.menu.subMenuUniqueOpened"
+                :collapse="
+                  settingsStore.mode === 'pc'
+                    && settingsStore.settings.menu.subMenuCollapse
+                "
+                class="menu"
+                :class="{
+                  '-mt-2': !['head', 'single'].includes(
+                    settingsStore.settings.menu.mode,
+                  ),
                 }"
               />
             </div>
@@ -89,8 +121,23 @@ onMounted(() => {
         </TransitionGroup>
       </div>
     </div>
-    <div v-if="settingsStore.mode === 'pc'" class="relative flex items-center px-4 py-3" :class="[settingsStore.settings.menu.subMenuCollapse ? 'justify-center' : 'justify-end']">
-      <span v-show="settingsStore.settings.menu.enableSubMenuCollapseButton" class="flex-center cursor-pointer rounded bg-stone-1 p-2 transition dark-bg-stone-9 hover-bg-stone-2 dark-hover-bg-stone-8" :class="{ '-rotate-z-180': settingsStore.settings.menu.subMenuCollapse }" @click="settingsStore.toggleSidebarCollapse()">
+    <div
+      v-if="settingsStore.mode === 'pc'"
+      class="relative flex items-center px-4 py-3"
+      :class="[
+        settingsStore.settings.menu.subMenuCollapse
+          ? 'justify-center'
+          : 'justify-end',
+      ]"
+    >
+      <span
+        v-show="settingsStore.settings.menu.enableSubMenuCollapseButton"
+        class="flex-center cursor-pointer rounded bg-stone-1 p-2 transition dark-bg-stone-9 hover-bg-stone-2 dark-hover-bg-stone-8"
+        :class="{
+          '-rotate-z-180': settingsStore.settings.menu.subMenuCollapse,
+        }"
+        @click="settingsStore.toggleSidebarCollapse()"
+      >
         <SvgIcon name="toolbar-collapse" />
       </span>
     </div>
@@ -107,7 +154,10 @@ onMounted(() => {
   flex-direction: column;
   width: var(--g-sub-sidebar-width);
   background-color: var(--g-sub-sidebar-bg);
-  transition: background-color 0.3s, left 0.3s, width 0.3s;
+  transition:
+    background-color 0.3s,
+    left 0.3s,
+    width 0.3s;
 
   &.is-collapse {
     width: var(--g-sub-sidebar-collapse-width);
@@ -141,15 +191,21 @@ onMounted(() => {
     overscroll-behavior: contain;
 
     &.shadow-top {
-      box-shadow: inset 0 10px 10px -10px var(--g-box-shadow-color), inset 0 0 0 transparent;
+      box-shadow:
+        inset 0 10px 10px -10px var(--g-box-shadow-color),
+        inset 0 0 0 transparent;
     }
 
     &.shadow-bottom {
-      box-shadow: inset 0 0 0 transparent, inset 0 -10px 10px -10px var(--g-box-shadow-color);
+      box-shadow:
+        inset 0 0 0 transparent,
+        inset 0 -10px 10px -10px var(--g-box-shadow-color);
     }
 
     &.shadow-top.shadow-bottom {
-      box-shadow: inset 0 10px 10px -10px var(--g-box-shadow-color), inset 0 -10px 10px -10px var(--g-box-shadow-color);
+      box-shadow:
+        inset 0 10px 10px -10px var(--g-box-shadow-color),
+        inset 0 -10px 10px -10px var(--g-box-shadow-color);
     }
   }
 

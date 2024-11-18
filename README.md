@@ -69,6 +69,7 @@
 <summary>Github Stars 曲线</summary>
 
 [![Stargazers over time](https://starchart.cc/fantastic-admin/basic.svg)](https://starchart.cc/fantastic-admin/basic)
+
 </details>
 
 ## 生态

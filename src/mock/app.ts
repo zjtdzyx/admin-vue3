@@ -52,7 +52,8 @@ export default defineFakeRoute([
                       {
                         path: 'level3',
                         name: 'multilevelMenuExample2-2',
-                        redirect: '/multilevel_menu_example/level2/level3/page1',
+                        redirect:
+                          '/multilevel_menu_example/level2/level3/page1',
                         meta: {
                           title: '导航2-2',
                         },
@@ -60,7 +61,8 @@ export default defineFakeRoute([
                           {
                             path: 'page1',
                             name: 'multilevelMenuExample2-2-1',
-                            component: 'multilevel_menu_example/level2/level3/page1.vue',
+                            component:
+                              'multilevel_menu_example/level2/level3/page1.vue',
                             meta: {
                               title: '导航2-2-1',
                             },
@@ -68,7 +70,8 @@ export default defineFakeRoute([
                           {
                             path: 'page2',
                             name: 'multilevelMenuExample2-2-2',
-                            component: 'multilevel_menu_example/level2/level3/page2.vue',
+                            component:
+                              'multilevel_menu_example/level2/level3/page2.vue',
                             meta: {
                               title: '导航2-2-2',
                             },

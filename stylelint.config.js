@@ -5,9 +5,7 @@ export default {
     'stylelint-config-recess-order',
     '@stylistic/stylelint-config',
   ],
-  plugins: [
-    'stylelint-scss',
-  ],
+  plugins: ['stylelint-scss'],
   rules: {
     'at-rule-no-unknown': null,
     'no-descending-specificity': null,
@@ -17,20 +15,7 @@ export default {
     'function-no-unknown': [
       true,
       {
-        ignoreFunctions: [
-          'v-bind',
-          'map-get',
-          'lighten',
-          'darken',
-        ],
-      },
-    ],
-    'selector-pseudo-element-no-unknown': [
-      true,
-      {
-        ignorePseudoElements: [
-          '/^view-transition/',
-        ],
+        ignoreFunctions: ['/^my-/'], // 示例：忽略以 'my-' 开头的自定义函数
       },
     ],
     'scss/double-slash-comment-empty-line-before': null,
@@ -42,10 +27,9 @@ export default {
         ignoreAtRules: ['if', 'else'],
       },
     ],
+    'scss/at-import-partial-extension-blacklist': null, // 新规则
+    'scss/operator-no-newline-after': null, // 修复错误
   },
   allowEmptyInput: true,
-  ignoreFiles: [
-    'node_modules/**/*',
-    'dist*/**/*',
-  ],
-}
+  ignoreFiles: ['node_modules/**/*', 'dist*/**/*'],
+};

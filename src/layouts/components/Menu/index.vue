@@ -8,24 +8,25 @@ defineOptions({
   name: 'MainMenu',
 })
 
-const props = withDefaults(
-  defineProps<MenuProps>(),
-  {
-    accordion: true,
-    defaultOpeneds: () => [],
-    mode: 'vertical',
-    collapse: false,
-    showCollapseName: false,
-  },
-)
+const props = withDefaults(defineProps<MenuProps>(), {
+  accordion: true,
+  defaultOpeneds: () => [],
+  mode: 'vertical',
+  collapse: false,
+  showCollapseName: false,
+})
 
 const activeIndex = ref<MenuInjection['activeIndex']>(props.value)
 const items = ref<MenuInjection['items']>({})
 const subMenus = ref<MenuInjection['subMenus']>({})
-const openedMenus = ref<MenuInjection['openedMenus']>(props.defaultOpeneds.slice(0))
+const openedMenus = ref<MenuInjection['openedMenus']>(
+  props.defaultOpeneds.slice(0),
+)
 const mouseInMenu = ref<MenuInjection['mouseInMenu']>([])
 const isMenuPopup = computed<MenuInjection['isMenuPopup']>(() => {
-  return props.mode === 'horizontal' || (props.mode === 'vertical' && props.collapse)
+  return (
+    props.mode === 'horizontal' || (props.mode === 'vertical' && props.collapse)
+  )
 })
 
 // 解析传入的 menu 数据，并保存到 items 和 subMenus 对象中
@@ -55,7 +56,9 @@ const openMenu: MenuInjection['openMenu'] = (index, indexPath) => {
     return
   }
   if (props.accordion) {
-    openedMenus.value = openedMenus.value.filter(key => indexPath.includes(key))
+    openedMenus.value = openedMenus.value.filter(key =>
+      indexPath.includes(key),
+    )
   }
   openedMenus.value.push(index)
 }
@@ -94,7 +97,10 @@ const handleMenuItemClick: MenuInjection['handleMenuItemClick'] = (index) => {
   }
   setSubMenusActive(index)
 }
-const handleSubMenuClick: MenuInjection['handleSubMenuClick'] = (index, indexPath) => {
+const handleSubMenuClick: MenuInjection['handleSubMenuClick'] = (
+  index,
+  indexPath,
+) => {
   if (openedMenus.value.includes(index)) {
     closeMenu(index)
   }
@@ -116,61 +122,87 @@ function initMenu() {
   })
 }
 
-watch(() => props.menu, (val) => {
-  initItems(val)
-  initMenu()
-}, {
-  deep: true,
-  immediate: true,
-})
+watch(
+  () => props.menu,
+  (val) => {
+    initItems(val)
+    initMenu()
+  },
+  {
+    deep: true,
+    immediate: true,
+  },
+)
 
-watch(() => props.value, (currentValue) => {
-  if (!items.value[currentValue]) {
-    activeIndex.value = ''
-  }
-  const item = items.value[currentValue] || (activeIndex.value && items.value[activeIndex.value]) || items.value[props.value]
-  if (item) {
-    activeIndex.value = item.index
-  }
-  else {
-    activeIndex.value = currentValue
-  }
-  initMenu()
-})
+watch(
+  () => props.value,
+  (currentValue) => {
+    if (!items.value[currentValue]) {
+      activeIndex.value = ''
+    }
+    const item
+      = items.value[currentValue]
+      || (activeIndex.value && items.value[activeIndex.value])
+      || items.value[props.value]
+    if (item) {
+      activeIndex.value = item.index
+    }
+    else {
+      activeIndex.value = currentValue
+    }
+    initMenu()
+  },
+)
 
-watch(() => props.collapse, (value) => {
-  if (value) {
-    openedMenus.value = []
-  }
-  initMenu()
-})
+watch(
+  () => props.collapse,
+  (value) => {
+    if (value) {
+      openedMenus.value = []
+    }
+    initMenu()
+  },
+)
 
-provide(rootMenuInjectionKey, reactive({
-  props,
-  items,
-  subMenus,
-  activeIndex,
-  openedMenus,
-  mouseInMenu,
-  isMenuPopup,
-  openMenu,
-  closeMenu,
-  handleMenuItemClick,
-  handleSubMenuClick,
-}))
+provide(
+  rootMenuInjectionKey,
+  reactive({
+    props,
+    items,
+    subMenus,
+    activeIndex,
+    openedMenus,
+    mouseInMenu,
+    isMenuPopup,
+    openMenu,
+    closeMenu,
+    handleMenuItemClick,
+    handleSubMenuClick,
+  }),
+)
 </script>
 
 <template>
   <div
-    class="h-full w-full flex flex-col of-hidden transition-all" :class="{
+    class="h-full w-full flex flex-col of-hidden transition-all"
+    :class="{
       'flex-row! w-auto!': isMenuPopup && props.mode === 'horizontal',
       'py-1': props.mode === 'vertical',
     }"
   >
     <template v-for="item in menu" :key="item.path ?? JSON.stringify(item)">
       <template v-if="item.meta?.menu !== false">
-        <SubMenu v-if="item.children?.length" :menu="item" :unique-key="[item.path ?? JSON.stringify(item)]" />
-        <Item v-else :item="item" :unique-key="[item.path ?? JSON.stringify(item)]" @click="handleMenuItemClick(item.path ?? JSON.stringify(item))" />
+        <SubMenu
+          v-if="item.children?.length"
+          :menu="item"
+          :unique-key="[item.path ?? JSON.stringify(item)]"
+        />
+        <Item
+          v-else
+          :item="item"
+          :unique-key="[item.path ?? JSON.stringify(item)]"
+          @click="handleMenuItemClick(item.path ?? JSON.stringify(item))"
+        />
       </template>
     </template>
   </div>

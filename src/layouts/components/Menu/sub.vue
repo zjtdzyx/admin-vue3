@@ -10,12 +10,9 @@ defineOptions({
   name: 'SubMenu',
 })
 
-const props = withDefaults(
-  defineProps<SubMenuProps>(),
-  {
-    level: 0,
-  },
-)
+const props = withDefaults(defineProps<SubMenuProps>(), {
+  level: 0,
+})
 
 const index = props.menu.path ?? JSON.stringify(props.menu)
 const itemRef = useTemplateRef('itemRef')
@@ -125,8 +122,8 @@ function handleMouseenter() {
     return
   }
   rootMenu.mouseInMenu = props.uniqueKey
-  timeout?.()
-  ;({ stop: timeout } = useTimeoutFn(() => {
+  timeout?.();
+  ({ stop: timeout } = useTimeoutFn(() => {
     if (hasChildren.value) {
       rootMenu.openMenu(index, props.uniqueKey)
       nextTick(() => {
@@ -138,27 +135,42 @@ function handleMouseenter() {
         let left = 0
         if (rootMenu.props.mode === 'vertical' || props.level !== 0) {
           top = el.getBoundingClientRect().top + el.scrollTop
-          left = el.getBoundingClientRect().left + el.getBoundingClientRect().width
-          if (top + subMenuRef.value!.getElement()!.offsetHeight > window.innerHeight) {
-            top = window.innerHeight - subMenuRef.value!.getElement()!.offsetHeight
+          left
+            = el.getBoundingClientRect().left + el.getBoundingClientRect().width
+          if (
+            top + subMenuRef.value!.getElement()!.offsetHeight
+            > window.innerHeight
+          ) {
+            top
+              = window.innerHeight - subMenuRef.value!.getElement()!.offsetHeight
           }
         }
         else {
-          top = el.getBoundingClientRect().top + el.getBoundingClientRect().height
+          top
+            = el.getBoundingClientRect().top + el.getBoundingClientRect().height
           left = el.getBoundingClientRect().left
-          if (top + subMenuRef.value!.getElement()!.offsetHeight > window.innerHeight) {
+          if (
+            top + subMenuRef.value!.getElement()!.offsetHeight
+            > window.innerHeight
+          ) {
             subMenuRef.value!.getElement()!.style.height = `${window.innerHeight - top}px`
           }
         }
-        if (left + subMenuRef.value!.getElement()!.offsetWidth > document.documentElement.clientWidth) {
-          left = el.getBoundingClientRect().left - el.getBoundingClientRect().width
+        if (
+          left + subMenuRef.value!.getElement()!.offsetWidth
+          > document.documentElement.clientWidth
+        ) {
+          left
+            = el.getBoundingClientRect().left - el.getBoundingClientRect().width
         }
         subMenuRef.value!.getElement()!.style.top = `${top}px`
         subMenuRef.value!.getElement()!.style.left = `${left}px`
       })
     }
     else {
-      const path = props.menu.children ? rootMenu.subMenus[index].indexPath.at(-1)! : rootMenu.items[index].indexPath.at(-1)!
+      const path = props.menu.children
+        ? rootMenu.subMenus[index].indexPath.at(-1)!
+        : rootMenu.items[index].indexPath.at(-1)!
       rootMenu.openMenu(path, rootMenu.subMenus[path].indexPath)
     }
   }, 300))
@@ -169,14 +181,15 @@ function handleMouseleave() {
     return
   }
   rootMenu.mouseInMenu = []
-  timeout?.()
-  ;({ stop: timeout } = useTimeoutFn(() => {
+  timeout?.();
+  ({ stop: timeout } = useTimeoutFn(() => {
     if (rootMenu.mouseInMenu.length === 0) {
       rootMenu.closeMenu(props.uniqueKey)
     }
     else {
       if (hasChildren.value) {
-        !rootMenu.mouseInMenu.includes(props.uniqueKey.at(-1)!) && rootMenu.closeMenu(props.uniqueKey.at(-1)!)
+        !rootMenu.mouseInMenu.includes(props.uniqueKey.at(-1)!)
+        && rootMenu.closeMenu(props.uniqueKey.at(-1)!)
       }
     }
   }, 300))
@@ -184,19 +197,45 @@ function handleMouseleave() {
 </script>
 
 <template>
-  <Item ref="itemRef" :unique-key="uniqueKey" :item="menu" :level="level" :sub-menu="hasChildren" :expand="opened" @click="handleClick" @mouseenter="handleMouseenter" @mouseleave="handleMouseleave" />
+  <Item
+    ref="itemRef"
+    :unique-key="uniqueKey"
+    :item="menu"
+    :level="level"
+    :sub-menu="hasChildren"
+    :expand="opened"
+    @click="handleClick"
+    @mouseenter="handleMouseenter"
+    @mouseleave="handleMouseleave"
+  />
   <Teleport v-if="hasChildren" to="body" :disabled="!rootMenu.isMenuPopup">
     <Transition v-bind="transitionClass" v-on="transitionEvent">
       <OverlayScrollbarsComponent
-        v-show="opened" ref="subMenuRef" :options="{ scrollbars: { visibility: 'hidden' } }" defer class="sub-menu static" :class="{
+        v-show="opened"
+        ref="subMenuRef"
+        :options="{ scrollbars: { visibility: 'hidden' } }"
+        defer
+        class="sub-menu static"
+        :class="{
           'bg-[var(--g-sub-sidebar-bg)]': rootMenu.isMenuPopup,
-          'ring-1 ring-stone-2 dark-ring-stone-8 shadow-xl fixed! z-3000 w-[200px]': rootMenu.isMenuPopup,
-          'mx-1': rootMenu.isMenuPopup && (rootMenu.props.mode === 'vertical' || level !== 0),
+          'ring-1 ring-stone-2 dark-ring-stone-8 shadow-xl fixed! z-3000 w-[200px]':
+            rootMenu.isMenuPopup,
+          'mx-1':
+            rootMenu.isMenuPopup
+            && (rootMenu.props.mode === 'vertical' || level !== 0),
           'py-1': rootMenu.isMenuPopup,
         }"
       >
-        <template v-for="item in menu.children" :key="item.path ?? JSON.stringify(item)">
-          <SubMenu v-if="item.meta?.menu !== false" :unique-key="[...uniqueKey, item.path ?? JSON.stringify(item)]" :menu="item" :level="level + 1" />
+        <template
+          v-for="item in menu.children"
+          :key="item.path ?? JSON.stringify(item)"
+        >
+          <SubMenu
+            v-if="item.meta?.menu !== false"
+            :unique-key="[...uniqueKey, item.path ?? JSON.stringify(item)]"
+            :menu="item"
+            :level="level + 1"
+          />
         </template>
       </OverlayScrollbarsComponent>
     </Transition>

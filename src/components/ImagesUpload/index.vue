@@ -34,9 +34,7 @@ const props = withDefaults(
 )
 
 const emits = defineEmits<{
-  onSuccess: [
-    res: any,
-  ]
+  onSuccess: [res: any]
 }>()
 
 const url = defineModel<string[]>({
@@ -103,8 +101,13 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
 
 <template>
   <div class="upload-container">
-    <div v-for="(item, index) in (url as string[])" :key="index" class="images">
-      <ElImage v-if="index < max" :src="item" :style="`width:${width}px;height:${height}px;`" fit="cover" />
+    <div v-for="(item, index) in url as string[]" :key="index" class="images">
+      <ElImage
+        v-if="index < max"
+        :src="item"
+        :style="`width:${width}px;height:${height}px;`"
+        fit="cover"
+      />
       <div class="mask">
         <div class="actions">
           <span title="预览" @click="preview(index)">
@@ -113,10 +116,20 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
           <span title="移除" @click="remove(index)">
             <SvgIcon name="i-ep:delete" class="icon" />
           </span>
-          <span v-show="url.length > 1" title="左移" :class="{ disabled: index === 0 }" @click="move(index, 'left')">
+          <span
+            v-show="url.length > 1"
+            title="左移"
+            :class="{ disabled: index === 0 }"
+            @click="move(index, 'left')"
+          >
             <SvgIcon name="i-ep:back" class="icon" />
           </span>
-          <span v-show="url.length > 1" title="右移" :class="{ disabled: index === url.length - 1 }" @click="move(index, 'right')">
+          <span
+            v-show="url.length > 1"
+            title="右移"
+            :class="{ disabled: index === url.length - 1 }"
+            @click="move(index, 'right')"
+          >
             <SvgIcon name="i-ep:right" class="icon" />
           </span>
         </div>
@@ -139,17 +152,40 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
       <div class="image-slot" :style="`width:${width}px;height:${height}px;`">
         <SvgIcon name="i-ep:plus" class="icon" />
       </div>
-      <div v-show="uploadData.progress.percent" class="progress" :style="`width:${width}px;height:${height}px;`">
-        <ElImage :src="uploadData.progress.preview" :style="`width:${width}px;height:${height}px;`" fit="fill" />
-        <ElProgress type="circle" :width="Math.min(width, height) * 0.8" :percentage="uploadData.progress.percent" />
+      <div
+        v-show="uploadData.progress.percent"
+        class="progress"
+        :style="`width:${width}px;height:${height}px;`"
+      >
+        <ElImage
+          :src="uploadData.progress.preview"
+          :style="`width:${width}px;height:${height}px;`"
+          fit="fill"
+        />
+        <ElProgress
+          type="circle"
+          :width="Math.min(width, height) * 0.8"
+          :percentage="uploadData.progress.percent"
+        />
       </div>
     </ElUpload>
     <div v-if="!notip" class="el-upload__tip">
       <div style="display: inline-block;">
-        <ElAlert :title="`上传图片支持 ${ext.join(' / ')} 格式，单张图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}，且图片数量不超过 ${max} 张`" type="info" show-icon :closable="false" />
+        <ElAlert
+          :title="`上传图片支持 ${ext.join(' / ')} 格式，单张图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}，且图片数量不超过 ${max} 张`"
+          type="info"
+          show-icon
+          :closable="false"
+        />
       </div>
     </div>
-    <ElImageViewer v-if="uploadData.imageViewerVisible" :url-list="url as string[]" :initial-index="uploadData.dialogImageIndex" teleported @close="previewClose" />
+    <ElImageViewer
+      v-if="uploadData.imageViewerVisible"
+      :url-list="url as string[]"
+      :initial-index="uploadData.dialogImageIndex"
+      teleported
+      @close="previewClose"
+    />
   </div>
 </template>
 
@@ -196,7 +232,9 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
         color: var(--el-color-white);
         text-align: center;
         cursor: pointer;
-        transition: color 0.1s, transform 0.1s;
+        transition:
+          color 0.1s,
+          transform 0.1s;
 
         &.disabled {
           color: var(--el-text-color-disabled);

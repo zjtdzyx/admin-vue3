@@ -30,11 +30,7 @@ const props = withDefaults(
 )
 
 const emits = defineEmits<{
-  onSuccess: [
-    res: any,
-    file: UploadUserFile,
-    fileList: UploadUserFile[],
-  ]
+  onSuccess: [res: any, file: UploadUserFile, fileList: UploadUserFile[]]
 }>()
 
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
@@ -60,17 +56,18 @@ const onSuccess: UploadProps['onSuccess'] = (res, file, fileList) => {
 }
 
 const onPreview: UploadProps['onPreview'] = (e) => {
-  const getBlob = (url: string) => new Promise((resolve) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open('GET', url, true)
-    xhr.responseType = 'blob'
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        resolve(xhr.response)
+  const getBlob = (url: string) =>
+    new Promise((resolve) => {
+      const xhr = new XMLHttpRequest()
+      xhr.open('GET', url, true)
+      xhr.responseType = 'blob'
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          resolve(xhr.response)
+        }
       }
-    }
-    xhr.send()
-  })
+      xhr.send()
+    })
   getBlob(e.url!).then((blob: any) => {
     const a = document.createElement('a')
     const url = window.URL.createObjectURL(blob)
@@ -107,7 +104,12 @@ const onPreview: UploadProps['onPreview'] = (e) => {
     <template #tip>
       <div v-if="!notip" class="el-upload__tip">
         <div style="display: inline-block;">
-          <ElAlert :title="`上传文件支持 ${ext.join(' / ')} 格式，单个文件大小不超过 ${size}MB，且文件数量不超过 ${max} 个`" type="info" show-icon :closable="false" />
+          <ElAlert
+            :title="`上传文件支持 ${ext.join(' / ')} 格式，单个文件大小不超过 ${size}MB，且文件数量不超过 ${max} 个`"
+            type="info"
+            show-icon
+            :closable="false"
+          />
         </div>
       </div>
     </template>

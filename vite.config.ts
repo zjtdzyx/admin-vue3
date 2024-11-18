@@ -13,7 +13,9 @@ export default defineConfig(({ mode, command }) => {
   const scssResources: string[] = []
   fs.readdirSync('src/assets/styles/resources').forEach((dirname) => {
     if (fs.statSync(`src/assets/styles/resources/${dirname}`).isFile()) {
-      scssResources.push(`@use "/src/assets/styles/resources/${dirname}" as *;`)
+      scssResources.push(
+        `@use "/src/assets/styles/resources/${dirname}" as *;`,
+      )
     }
   })
   return {

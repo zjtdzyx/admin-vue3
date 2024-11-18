@@ -61,12 +61,10 @@ const systemRoutes: RouteRecordRaw[] = [
 const asyncRoutes: Route.recordMainRaw[] = [
   {
     meta: {
-      title: '演示',
+      title: '嘉农',
       icon: 'i-uim:box',
     },
-    children: [
-      MultilevelMenuExample,
-    ],
+    children: [MultilevelMenuExample],
   },
 ]
 
@@ -74,9 +72,15 @@ const constantRoutesByFilesystem = generatedRoutes.filter((item) => {
   return item.meta?.enabled !== false && item.meta?.constant === true
 })
 
-const asyncRoutesByFilesystem = setupLayouts(generatedRoutes.filter((item) => {
-  return item.meta?.enabled !== false && item.meta?.constant !== true && item.meta?.layout !== false
-}))
+const asyncRoutesByFilesystem = setupLayouts(
+  generatedRoutes.filter((item) => {
+    return (
+      item.meta?.enabled !== false
+      && item.meta?.constant !== true
+      && item.meta?.layout !== false
+    )
+  }),
+)
 
 export {
   asyncRoutes,

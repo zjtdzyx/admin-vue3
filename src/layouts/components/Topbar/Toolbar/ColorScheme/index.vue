@@ -9,7 +9,10 @@ const settingsStore = useSettingsStore()
 
 function toggleColorScheme(event: MouseEvent) {
   const { startViewTransition } = useViewTransition(() => {
-    settingsStore.currentColorScheme && settingsStore.setColorScheme(settingsStore.currentColorScheme === 'dark' ? 'light' : 'dark')
+    settingsStore.currentColorScheme
+    && settingsStore.setColorScheme(
+      settingsStore.currentColorScheme === 'dark' ? 'light' : 'dark',
+    )
   })
   startViewTransition()?.ready.then(() => {
     const x = event.clientX
@@ -24,12 +27,18 @@ function toggleColorScheme(event: MouseEvent) {
     ]
     document.documentElement.animate(
       {
-        clipPath: settingsStore.settings.app.colorScheme !== 'dark' ? clipPath : clipPath.reverse(),
+        clipPath:
+          settingsStore.settings.app.colorScheme !== 'dark'
+            ? clipPath
+            : clipPath.reverse(),
       },
       {
         duration: 300,
         easing: 'ease-out',
-        pseudoElement: settingsStore.settings.app.colorScheme !== 'dark' ? '::view-transition-new(root)' : '::view-transition-old(root)',
+        pseudoElement:
+          settingsStore.settings.app.colorScheme !== 'dark'
+            ? '::view-transition-new(root)'
+            : '::view-transition-old(root)',
       },
     )
   })
@@ -39,11 +48,14 @@ function toggleColorScheme(event: MouseEvent) {
 <template>
   <HDropdown class="flex-center cursor-pointer px-2 py-1">
     <SvgIcon
-      :name="{
-        '': 'i-codicon:color-mode',
-        'light': 'i-ri:sun-line',
-        'dark': 'i-ri:moon-line',
-      }[settingsStore.settings.app.colorScheme]" @click="toggleColorScheme"
+      :name="
+        {
+          '': 'i-codicon:color-mode',
+          'light': 'i-ri:sun-line',
+          'dark': 'i-ri:moon-line',
+        }[settingsStore.settings.app.colorScheme]
+      "
+      @click="toggleColorScheme"
     />
     <template #dropdown>
       <HTabList

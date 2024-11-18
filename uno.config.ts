@@ -23,23 +23,26 @@ export default defineConfig<Theme>({
     },
   },
   shortcuts: [
-    [/^flex-?(col)?-(start|end|center|baseline|stretch)-?(start|end|center|between|around|evenly|left|right)?$/, ([, col, items, justify]) => {
-      const cls = ['flex']
-      if (col === 'col') {
-        cls.push('flex-col')
-      }
-      if (items === 'center' && !justify) {
-        cls.push('items-center')
-        cls.push('justify-center')
-      }
-      else {
-        cls.push(`items-${items}`)
-        if (justify) {
-          cls.push(`justify-${justify}`)
+    [
+      /^flex-?(col)?-(start|end|center|baseline|stretch)-?(start|end|center|between|around|evenly|left|right)?$/,
+      ([, col, items, justify]) => {
+        const cls = ['flex']
+        if (col === 'col') {
+          cls.push('flex-col')
         }
-      }
-      return cls.join(' ')
-    }],
+        if (items === 'center' && !justify) {
+          cls.push('items-center')
+          cls.push('justify-center')
+        }
+        else {
+          cls.push(`items-${items}`)
+          if (justify) {
+            cls.push(`justify-${justify}`)
+          }
+        }
+        return cls.join(' ')
+      },
+    ],
   ],
   preflights: [
     {
@@ -48,10 +51,15 @@ export default defineConfig<Theme>({
         // 明亮主题
         const lightCss = entriesToCss(Object.entries(lightTheme))
         const lightRoots = toArray([`*,::before,::after`, `::backdrop`])
-        returnCss.push(lightRoots.map(root => `${root}{${lightCss}}`).join(''))
+        returnCss.push(
+          lightRoots.map(root => `${root}{${lightCss}}`).join(''),
+        )
         // 暗黑主题
         const darkCss = entriesToCss(Object.entries(darkTheme))
-        const darkRoots = toArray([`html.dark,html.dark *,html.dark ::before,html.dark ::after`, `html.dark ::backdrop`])
+        const darkRoots = toArray([
+          `html.dark,html.dark *,html.dark ::before,html.dark ::after`,
+          `html.dark ::backdrop`,
+        ])
         returnCss.push(darkRoots.map(root => `${root}{${darkCss}}`).join(''))
 
         return returnCss.join('')
@@ -81,7 +89,5 @@ export default defineConfig<Theme>({
     transformerVariantGroup(),
     transformerCompileClass(),
   ],
-  configDeps: [
-    'themes/index.ts',
-  ],
+  configDeps: ['themes/index.ts'],
 })

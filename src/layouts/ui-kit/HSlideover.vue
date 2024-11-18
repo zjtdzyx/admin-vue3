@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Dialog, DialogDescription, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
+import {
+  Dialog,
+  DialogDescription,
+  DialogPanel,
+  DialogTitle,
+  TransitionChild,
+  TransitionRoot,
+} from '@headlessui/vue'
 import { OverlayScrollbarsComponent } from 'overlayscrollbars-vue'
 
 const props = withDefaults(
@@ -56,24 +63,63 @@ function close() {
 
 <template>
   <TransitionRoot as="template" :appear="appear" :show="isOpen">
-    <Dialog class="fixed inset-0 z-2000 flex" :class="{ 'justify-end': side === 'right' }" @close="!preventClose && close()">
-      <TransitionChild as="template" :appear="appear" v-bind="overlayTransitionClass">
-        <div class="fixed inset-0 bg-stone-2/75 transition-opacity dark-bg-stone-8/75" :class="{ 'backdrop-blur-sm': overlay }" />
+    <Dialog
+      class="fixed inset-0 z-2000 flex"
+      :class="{ 'justify-end': side === 'right' }"
+      @close="!preventClose && close()"
+    >
+      <TransitionChild
+        as="template"
+        :appear="appear"
+        v-bind="overlayTransitionClass"
+      >
+        <div
+          class="fixed inset-0 bg-stone-2/75 transition-opacity dark-bg-stone-8/75"
+          :class="{ 'backdrop-blur-sm': overlay }"
+        />
       </TransitionChild>
       <TransitionChild as="template" :appear="appear" v-bind="transitionClass">
-        <DialogPanel relative max-w-md w-full w-screen flex flex-1 flex-col bg-white dark-bg-stone-8 focus-outline-none>
-          <div flex="~ items-center justify-between" p-4 border-b="~ solid stone/15" text-6>
+        <DialogPanel
+          relative
+          max-w-md
+          w-full
+          w-screen
+          flex
+          flex-1
+          flex-col
+          bg-white
+          dark-bg-stone-8
+          focus-outline-none
+        >
+          <div
+            flex="~ items-center justify-between"
+            p-4
+            border-b="~ solid stone/15"
+            text-6
+          >
             <DialogTitle m-0 text-lg text-dark dark-text-white>
               {{ title }}
             </DialogTitle>
             <SvgIcon name="i-carbon:close" cursor-pointer @click="close" />
           </div>
           <DialogDescription m-0 flex-1 of-y-hidden>
-            <OverlayScrollbarsComponent :options="{ scrollbars: { autoHide: 'leave', autoHideDelay: 300 } }" defer class="h-full p-4">
+            <OverlayScrollbarsComponent
+              :options="{
+                scrollbars: { autoHide: 'leave', autoHideDelay: 300 },
+              }"
+              defer
+              class="h-full p-4"
+            >
               <slot />
             </OverlayScrollbarsComponent>
           </DialogDescription>
-          <div v-if="!!slots.footer" flex="~ items-center justify-end" px-3 py-2 border-t="~ solid stone/15">
+          <div
+            v-if="!!slots.footer"
+            flex="~ items-center justify-end"
+            px-3
+            py-2
+            border-t="~ solid stone/15"
+          >
             <slot name="footer" />
           </div>
         </DialogPanel>

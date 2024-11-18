@@ -29,29 +29,42 @@ const tabsRef = useTemplateRef('tabsRef')
 const tabContainerRef = useTemplateRef('tabContainerRef')
 const tabRef = useTemplateRef<HTMLElement[]>('tabRef')
 
-watch(() => route, (val) => {
-  if (settingsStore.settings.tabbar.enable) {
-    tabbarStore.add(val).then(() => {
-      const index = tabbarStore.list.findIndex(item => item.tabId === activedTabId.value)
-      if (index !== -1) {
-        tabRef.value && scrollTo(tabRef.value[index].offsetLeft)
-        tabbarScrollTip()
-      }
-    })
-  }
-}, {
-  immediate: true,
-  deep: true,
-})
+watch(
+  () => route,
+  (val) => {
+    if (settingsStore.settings.tabbar.enable) {
+      tabbarStore.add(val).then(() => {
+        const index = tabbarStore.list.findIndex(
+          item => item.tabId === activedTabId.value,
+        )
+        if (index !== -1) {
+          tabRef.value && scrollTo(tabRef.value[index].offsetLeft)
+          tabbarScrollTip()
+        }
+      })
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  },
+)
 function tabbarScrollTip() {
-  if (tabContainerRef.value?.$el.clientWidth > (tabsRef.value?.clientWidth ?? 0) && localStorage.getItem('tabbarScrollTip') === undefined) {
+  if (
+    tabContainerRef.value?.$el.clientWidth
+    > (tabsRef.value?.clientWidth ?? 0)
+    && localStorage.getItem('tabbarScrollTip') === undefined
+  ) {
     localStorage.setItem('tabbarScrollTip', '')
-    Message.info('标签栏数量超过展示区域范围，可以将鼠标移到标签栏上，通过鼠标滚轮滑动浏览', {
-      title: '温馨提示',
-      duration: 5000,
-      closable: true,
-      zIndex: 2000,
-    })
+    Message.info(
+      '标签栏数量超过展示区域范围，可以将鼠标移到标签栏上，通过鼠标滚轮滑动浏览',
+      {
+        title: '温馨提示',
+        duration: 5000,
+        closable: true,
+        zIndex: 2000,
+      },
+    )
   }
 }
 function handlerMouserScroll(event: WheelEvent) {
@@ -115,74 +128,118 @@ function onTabbarContextmenu(event: MouseEvent, routeItem: Tabbar.recordRaw) {
 }
 
 onMounted(() => {
-  hotkeys('alt+left,alt+right,alt+w,alt+1,alt+2,alt+3,alt+4,alt+5,alt+6,alt+7,alt+8,alt+9,alt+0', (e, handle) => {
-    if (settingsStore.settings.tabbar.enable && settingsStore.settings.tabbar.enableHotkeys) {
-      e.preventDefault()
-      switch (handle.key) {
-        // 切换到当前标签页紧邻的上一个标签页
-        case 'alt+left':
-          if (tabbarStore.list[0].tabId !== activedTabId.value) {
-            const index = tabbarStore.list.findIndex(item => item.tabId === activedTabId.value)
-            router.push(tabbarStore.list[index - 1].fullPath)
+  hotkeys(
+    'alt+left,alt+right,alt+w,alt+1,alt+2,alt+3,alt+4,alt+5,alt+6,alt+7,alt+8,alt+9,alt+0',
+    (e, handle) => {
+      if (
+        settingsStore.settings.tabbar.enable
+        && settingsStore.settings.tabbar.enableHotkeys
+      ) {
+        e.preventDefault()
+        switch (handle.key) {
+          // 切换到当前标签页紧邻的上一个标签页
+          case 'alt+left':
+            if (tabbarStore.list[0].tabId !== activedTabId.value) {
+              const index = tabbarStore.list.findIndex(
+                item => item.tabId === activedTabId.value,
+              )
+              router.push(tabbarStore.list[index - 1].fullPath)
+            }
+            break
+          // 切换到当前标签页紧邻的下一个标签页
+          case 'alt+right':
+            if (tabbarStore.list.at(-1)?.tabId !== activedTabId.value) {
+              const index = tabbarStore.list.findIndex(
+                item => item.tabId === activedTabId.value,
+              )
+              router.push(tabbarStore.list[index + 1].fullPath)
+            }
+            break
+          // 关闭当前标签页
+          case 'alt+w':
+            tabbar.closeById(activedTabId.value)
+            break
+          // 切换到第 n 个标签页
+          case 'alt+1':
+          case 'alt+2':
+          case 'alt+3':
+          case 'alt+4':
+          case 'alt+5':
+          case 'alt+6':
+          case 'alt+7':
+          case 'alt+8':
+          case 'alt+9': {
+            const number = Number(handle.key.split('+')[1])
+            tabbarStore.list[number - 1]?.fullPath
+            && router.push(tabbarStore.list[number - 1].fullPath)
+            break
           }
-          break
-        // 切换到当前标签页紧邻的下一个标签页
-        case 'alt+right':
-          if (tabbarStore.list.at(-1)?.tabId !== activedTabId.value) {
-            const index = tabbarStore.list.findIndex(item => item.tabId === activedTabId.value)
-            router.push(tabbarStore.list[index + 1].fullPath)
-          }
-          break
-        // 关闭当前标签页
-        case 'alt+w':
-          tabbar.closeById(activedTabId.value)
-          break
-        // 切换到第 n 个标签页
-        case 'alt+1':
-        case 'alt+2':
-        case 'alt+3':
-        case 'alt+4':
-        case 'alt+5':
-        case 'alt+6':
-        case 'alt+7':
-        case 'alt+8':
-        case 'alt+9':
-        {
-          const number = Number(handle.key.split('+')[1])
-          tabbarStore.list[number - 1]?.fullPath && router.push(tabbarStore.list[number - 1].fullPath)
-          break
+          // 切换到最后一个标签页
+          case 'alt+0':
+            router.push(tabbarStore.list[tabbarStore.list.length - 1].fullPath)
+            break
         }
-        // 切换到最后一个标签页
-        case 'alt+0':
-          router.push(tabbarStore.list[tabbarStore.list.length - 1].fullPath)
-          break
       }
-    }
-  })
+    },
+  )
 })
 onUnmounted(() => {
-  hotkeys.unbind('alt+left,alt+right,alt+w,alt+1,alt+2,alt+3,alt+4,alt+5,alt+6,alt+7,alt+8,alt+9,alt+0')
+  hotkeys.unbind(
+    'alt+left,alt+right,alt+w,alt+1,alt+2,alt+3,alt+4,alt+5,alt+6,alt+7,alt+8,alt+9,alt+0',
+  )
 })
 </script>
 
 <template>
   <div class="tabbar-container">
-    <div ref="tabsRef" class="tabs scrollbar-none" @wheel.prevent="handlerMouserScroll">
-      <TransitionGroup ref="tabContainerRef" name="tabbar" tag="div" class="tab-container">
+    <div
+      ref="tabsRef"
+      class="tabs scrollbar-none"
+      @wheel.prevent="handlerMouserScroll"
+    >
+      <TransitionGroup
+        ref="tabContainerRef"
+        name="tabbar"
+        tag="div"
+        class="tab-container"
+      >
         <div
-          v-for="(element, index) in tabbarStore.list" :key="element.tabId"
-          ref="tabRef" :data-index="index" class="tab" :class="{
+          v-for="(element, index) in tabbarStore.list"
+          :key="element.tabId"
+          ref="tabRef"
+          :data-index="index"
+          class="tab"
+          :class="{
             actived: element.tabId === activedTabId,
-          }" :title="typeof element?.title === 'function' ? element.title() : element.title" @click="router.push(element.fullPath)" @contextmenu="onTabbarContextmenu($event, element)"
+          }"
+          :title="
+            typeof element?.title === 'function'
+              ? element.title()
+              : element.title
+          "
+          @click="router.push(element.fullPath)"
+          @contextmenu="onTabbarContextmenu($event, element)"
         >
           <div class="tab-dividers" />
           <div class="tab-background" />
           <div class="tab-content">
             <div :key="element.tabId" class="title">
-              <SvgIcon v-if="settingsStore.settings.tabbar.enableIcon && element.icon" :name="element.icon" class="icon" />
-              {{ typeof element?.title === 'function' ? element.title() : element.title }}
+              <SvgIcon
+                v-if="settingsStore.settings.tabbar.enableIcon && element.icon"
+                :name="element.icon"
+                class="icon"
+              />
+              {{
+                typeof element?.title === 'function'
+                  ? element.title()
+                  : element.title
+              }}
             </div>
-            <div v-if="tabbarStore.list.length > 1" class="action-icon" @click.stop="tabbar.closeById(element.tabId)">
+            <div
+              v-if="tabbarStore.list.length > 1"
+              class="action-icon"
+              @click.stop="tabbar.closeById(element.tabId)"
+            >
               <SvgIcon name="i-ri:close-fill" />
             </div>
             <div v-show="keys.alt && index < 9" class="hotkey-number">
@@ -331,7 +388,9 @@ onUnmounted(() => {
             content: "";
             background-color: var(--g-tabbar-dividers-bg);
             opacity: 1;
-            transition: opacity 0.2s ease, background-color 0.3s;
+            transition:
+              opacity 0.2s ease,
+              background-color 0.3s;
           }
         }
 
@@ -347,7 +406,9 @@ onUnmounted(() => {
           width: 100%;
           height: 100%;
           pointer-events: none;
-          transition: opacity 0.3s, background-color 0.3s;
+          transition:
+            opacity 0.3s,
+            background-color 0.3s;
         }
 
         .tab-content {
@@ -367,7 +428,12 @@ onUnmounted(() => {
             overflow: hidden;
             color: var(--g-tabbar-tab-color);
             white-space: nowrap;
-            mask-image: linear-gradient(to right, #000 calc(100% - 20px), transparent);
+            mask-image:
+              linear-gradient(
+                to right,
+                #000 calc(100% - 20px),
+                transparent
+              );
             transition: margin-right 0.3s;
 
             &:has(+ .action-icon) {

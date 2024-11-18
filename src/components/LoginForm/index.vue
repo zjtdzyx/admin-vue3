@@ -30,9 +30,7 @@ const form = ref({
   remember: !!localStorage.login_account,
 })
 const rules = ref<FormRules>({
-  account: [
-    { required: true, trigger: 'blur', message: '请输入用户名' },
-  ],
+  account: [{ required: true, trigger: 'blur', message: '请输入用户名' }],
   password: [
     { required: true, trigger: 'blur', message: '请输入密码' },
     { min: 6, max: 18, trigger: 'blur', message: '密码长度为6到18位' },
@@ -42,17 +40,20 @@ function handleLogin() {
   formRef.value?.validate((valid) => {
     if (valid) {
       loading.value = true
-      userStore.login(form.value).then(() => {
-        if (form.value.remember) {
-          localStorage.setItem('login_account', form.value.account)
-        }
-        else {
-          localStorage.removeItem('login_account')
-        }
-        emits('onLogin', form.value.account)
-      }).finally(() => {
-        loading.value = false
-      })
+      userStore
+        .login(form.value)
+        .then(() => {
+          if (form.value.remember) {
+            localStorage.setItem('login_account', form.value.account)
+          }
+          else {
+            localStorage.removeItem('login_account')
+          }
+          emits('onLogin', form.value.account)
+        })
+        .finally(() => {
+          loading.value = false
+        })
     }
   })
 }
@@ -65,10 +66,16 @@ function testAccount(account: string) {
 </script>
 
 <template>
-  <ElForm ref="formRef" :model="form" :rules="rules" class="min-h-500px w-full flex-col-stretch-center p-12">
+  <ElForm
+    ref="formRef"
+    :model="form"
+    :rules="rules"
+    class="min-h-500px w-full flex-col-stretch-center p-12"
+  >
     <div class="mb-6">
       <HTabList
-        v-model="type" :options="[
+        v-model="type"
+        :options="[
           { label: '账号密码登录', value: 'default' },
           { label: '扫码登录', value: 'qrcode' },
         ]"
@@ -80,14 +87,28 @@ function testAccount(account: string) {
       </h3>
       <div>
         <ElFormItem prop="account">
-          <ElInput v-model="form.account" size="large" placeholder="用户名" type="text" tabindex="1">
+          <ElInput
+            v-model="form.account"
+            size="large"
+            placeholder="用户名"
+            type="text"
+            tabindex="1"
+          >
             <template #prefix>
               <SvgIcon name="i-ri:user-3-fill" />
             </template>
           </ElInput>
         </ElFormItem>
         <ElFormItem prop="password">
-          <ElInput v-model="form.password" type="password" size="large" placeholder="密码" tabindex="2" show-password @keyup.enter="handleLogin">
+          <ElInput
+            v-model="form.password"
+            type="password"
+            size="large"
+            placeholder="密码"
+            tabindex="2"
+            show-password
+            @keyup.enter="handleLogin"
+          >
             <template #prefix>
               <SvgIcon name="i-ri:lock-2-fill" />
             </template>
@@ -98,23 +119,42 @@ function testAccount(account: string) {
         <ElCheckbox v-model="form.remember">
           记住我
         </ElCheckbox>
-        <ElLink type="primary" :underline="false" @click="emits('onResetPassword', form.account)">
+        <ElLink
+          type="primary"
+          :underline="false"
+          @click="emits('onResetPassword', form.account)"
+        >
           忘记密码了?
         </ElLink>
       </div>
-      <ElButton :loading="loading" type="primary" size="large" style="width: 100%;" @click.prevent="handleLogin">
+      <ElButton
+        :loading="loading"
+        type="primary"
+        size="large"
+        style="width: 100%;"
+        @click.prevent="handleLogin"
+      >
         登录
       </ElButton>
-      <div class="mt-4 flex-center gap-2 text-sm color-[var(--el-text-color-secondary)]">
+      <div
+        class="mt-4 flex-center gap-2 text-sm color-[var(--el-text-color-secondary)]"
+      >
         还没有帐号?
-        <ElLink type="primary" :underline="false" @click="emits('onRegister', form.account)">
+        <ElLink
+          type="primary"
+          :underline="false"
+          @click="emits('onRegister', form.account)"
+        >
           创建新帐号
         </ElLink>
       </div>
     </template>
     <template v-else-if="type === 'qrcode'">
       <div class="flex-col-center">
-        <el-image src="https://s2.loli.net/2024/04/26/GsahtuIZ9XOg5jr.png" class="h-[250px] w-[250px]" />
+        <el-image
+          src="https://s2.loli.net/2024/04/26/GsahtuIZ9XOg5jr.png"
+          class="h-[250px] w-[250px]"
+        />
         <div class="mt-2 op-50">
           请使用微信扫码登录
         </div>

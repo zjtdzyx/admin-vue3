@@ -31,14 +31,25 @@ onMounted(() => {
               <HKbd>I</HKbd>
               查看系统信息
             </li>
-            <li v-if="settingsStore.settings.toolbar.navSearch && settingsStore.settings.navSearch.enableHotkeys" class="py-1">
+            <li
+              v-if="
+                settingsStore.settings.toolbar.navSearch
+                  && settingsStore.settings.navSearch.enableHotkeys
+              "
+              class="py-1"
+            >
               <HKbd>{{ settingsStore.os === 'mac' ? '⌥' : 'Alt' }}</HKbd>
               <HKbd>S</HKbd>
               唤起导航搜索
             </li>
           </ul>
         </div>
-        <div v-if="settingsStore.settings.menu.enableHotkeys && ['side', 'head'].includes(settingsStore.settings.menu.mode)">
+        <div
+          v-if="
+            settingsStore.settings.menu.enableHotkeys
+              && ['side', 'head'].includes(settingsStore.settings.menu.mode)
+          "
+        >
           <h2 class="m-0 text-lg font-bold">
             主导航
           </h2>
@@ -50,7 +61,12 @@ onMounted(() => {
             </li>
           </ul>
         </div>
-        <div v-if="settingsStore.settings.tabbar.enable && settingsStore.settings.tabbar.enableHotkeys">
+        <div
+          v-if="
+            settingsStore.settings.tabbar.enable
+              && settingsStore.settings.tabbar.enableHotkeys
+          "
+        >
           <h2 class="m-0 text-lg font-bold">
             标签栏
           </h2>

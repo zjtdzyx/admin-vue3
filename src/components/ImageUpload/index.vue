@@ -32,9 +32,7 @@ const props = withDefaults(
 )
 
 const emits = defineEmits<{
-  onSuccess: [
-    res: any,
-  ]
+  onSuccess: [res: any]
 }>()
 
 const url = defineModel<string>({
@@ -102,15 +100,27 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
       drag
       class="image-upload"
     >
-      <ElImage v-if="url === ''" :src="url === '' ? placeholder : url" :style="`width:${width}px;height:${height}px;`" fit="fill">
+      <ElImage
+        v-if="url === ''"
+        :src="url === '' ? placeholder : url"
+        :style="`width:${width}px;height:${height}px;`"
+        fit="fill"
+      >
         <template #error>
-          <div class="image-slot" :style="`width:${width}px;height:${height}px;`">
+          <div
+            class="image-slot"
+            :style="`width:${width}px;height:${height}px;`"
+          >
             <SvgIcon name="i-ep:plus" class="icon" />
           </div>
         </template>
       </ElImage>
       <div v-else class="image">
-        <ElImage :src="url" :style="`width:${width}px;height:${height}px;`" fit="fill" />
+        <ElImage
+          :src="url"
+          :style="`width:${width}px;height:${height}px;`"
+          fit="fill"
+        />
         <div class="mask">
           <div class="actions">
             <span title="预览" @click.stop="preview">
@@ -122,17 +132,39 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
           </div>
         </div>
       </div>
-      <div v-show="url === '' && uploadData.progress.percent" class="progress" :style="`width:${width}px;height:${height}px;`">
-        <ElImage :src="uploadData.progress.preview" :style="`width:${width}px;height:${height}px;`" fit="fill" />
-        <ElProgress type="circle" :width="Math.min(width, height) * 0.8" :percentage="uploadData.progress.percent" />
+      <div
+        v-show="url === '' && uploadData.progress.percent"
+        class="progress"
+        :style="`width:${width}px;height:${height}px;`"
+      >
+        <ElImage
+          :src="uploadData.progress.preview"
+          :style="`width:${width}px;height:${height}px;`"
+          fit="fill"
+        />
+        <ElProgress
+          type="circle"
+          :width="Math.min(width, height) * 0.8"
+          :percentage="uploadData.progress.percent"
+        />
       </div>
     </ElUpload>
     <div v-if="!notip" class="el-upload__tip">
       <div style="display: inline-block;">
-        <ElAlert :title="`上传图片支持 ${ext.join(' / ')} 格式，且图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}`" type="info" show-icon :closable="false" />
+        <ElAlert
+          :title="`上传图片支持 ${ext.join(' / ')} 格式，且图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}`"
+          type="info"
+          show-icon
+          :closable="false"
+        />
       </div>
     </div>
-    <ElImageViewer v-if="uploadData.imageViewerVisible" :url-list="[url]" teleported @close="previewClose" />
+    <ElImageViewer
+      v-if="uploadData.imageViewerVisible"
+      :url-list="[url]"
+      teleported
+      @close="previewClose"
+    />
   </div>
 </template>
 
@@ -176,7 +208,9 @@ const onSuccess: UploadProps['onSuccess'] = (res) => {
         color: var(--el-color-white);
         text-align: center;
         cursor: pointer;
-        transition: color 0.1s, transform 0.1s;
+        transition:
+          color 0.1s,
+          transform 0.1s;
 
         &:hover {
           transform: scale(1.5);

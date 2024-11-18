@@ -9,18 +9,24 @@ const useSettingsStore = defineStore(
   () => {
     const settings = ref(settingsDefault)
 
-    const prefersColorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+    const prefersColorScheme = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    )
     const currentColorScheme = ref<Exclude<Settings.app['colorScheme'], ''>>()
-    watch(() => settings.value.app.colorScheme, (val) => {
-      if (val === '') {
-        prefersColorScheme.addEventListener('change', updateTheme)
-      }
-      else {
-        prefersColorScheme.removeEventListener('change', updateTheme)
-      }
-    }, {
-      immediate: true,
-    })
+    watch(
+      () => settings.value.app.colorScheme,
+      (val) => {
+        if (val === '') {
+          prefersColorScheme.addEventListener('change', updateTheme)
+        }
+        else {
+          prefersColorScheme.removeEventListener('change', updateTheme)
+        }
+      },
+      {
+        immediate: true,
+      },
+    )
     watch(() => settings.value.app.colorScheme, updateTheme, {
       immediate: true,
     })
@@ -39,29 +45,43 @@ const useSettingsStore = defineStore(
           break
       }
     }
-    watch([
-      () => settings.value.app.enableMournMode,
-      () => settings.value.app.enableColorAmblyopiaMode,
-    ], (val) => {
-      document.documentElement.style.removeProperty('filter')
-      if (val[0] && val[1]) {
-        document.documentElement.style.setProperty('filter', 'grayscale(100%) invert(80%)')
-      }
-      else if (val[0]) {
-        document.documentElement.style.setProperty('filter', 'grayscale(100%)')
-      }
-      else if (val[1]) {
-        document.documentElement.style.setProperty('filter', 'invert(80%)')
-      }
-    }, {
-      immediate: true,
-    })
+    watch(
+      [
+        () => settings.value.app.enableMournMode,
+        () => settings.value.app.enableColorAmblyopiaMode,
+      ],
+      (val) => {
+        document.documentElement.style.removeProperty('filter')
+        if (val[0] && val[1]) {
+          document.documentElement.style.setProperty(
+            'filter',
+            'grayscale(100%) invert(80%)',
+          )
+        }
+        else if (val[0]) {
+          document.documentElement.style.setProperty(
+            'filter',
+            'grayscale(100%)',
+          )
+        }
+        else if (val[1]) {
+          document.documentElement.style.setProperty('filter', 'invert(80%)')
+        }
+      },
+      {
+        immediate: true,
+      },
+    )
 
-    watch(() => settings.value.menu.mode, (val) => {
-      document.body.setAttribute('data-menu-mode', val)
-    }, {
-      immediate: true,
-    })
+    watch(
+      () => settings.value.menu.mode,
+      (val) => {
+        document.body.setAttribute('data-menu-mode', val)
+      },
+      {
+        immediate: true,
+      },
+    )
 
     // 操作系统
     const os = ref<'mac' | 'windows' | 'linux' | 'other'>('other')
@@ -91,7 +111,11 @@ const useSettingsStore = defineStore(
     function setMode(width: number) {
       if (settings.value.layout.enableMobileAdaptation) {
         // 先判断 UA 是否为移动端设备（手机&平板）
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        if (
+          /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+            navigator.userAgent,
+          )
+        ) {
           mode.value = 'mobile'
         }
         else {
@@ -106,28 +130,37 @@ const useSettingsStore = defineStore(
 
     // 切换侧边栏导航展开/收起
     function toggleSidebarCollapse() {
-      settings.value.menu.subMenuCollapse = !settings.value.menu.subMenuCollapse
+      settings.value.menu.subMenuCollapse
+        = !settings.value.menu.subMenuCollapse
     }
     // 次导航是否收起（用于记录 pc 模式下最后的状态）
     const subMenuCollapseLastStatus = ref(settingsDefault.menu.subMenuCollapse)
-    watch(() => settings.value.menu.subMenuCollapse, (val) => {
-      if (mode.value === 'pc') {
-        subMenuCollapseLastStatus.value = val
-      }
-    })
-    watch(mode, (val) => {
-      switch (val) {
-        case 'pc':
-          settings.value.menu.subMenuCollapse = subMenuCollapseLastStatus.value
-          break
-        case 'mobile':
-          settings.value.menu.subMenuCollapse = true
-          break
-      }
-      document.body.setAttribute('data-mode', val)
-    }, {
-      immediate: true,
-    })
+    watch(
+      () => settings.value.menu.subMenuCollapse,
+      (val) => {
+        if (mode.value === 'pc') {
+          subMenuCollapseLastStatus.value = val
+        }
+      },
+    )
+    watch(
+      mode,
+      (val) => {
+        switch (val) {
+          case 'pc':
+            settings.value.menu.subMenuCollapse
+              = subMenuCollapseLastStatus.value
+            break
+          case 'mobile':
+            settings.value.menu.subMenuCollapse = true
+            break
+        }
+        document.body.setAttribute('data-mode', val)
+      },
+      {
+        immediate: true,
+      },
+    )
 
     // 设置主题颜色模式
     function setColorScheme(color: Required<Settings.app>['colorScheme']) {
@@ -136,7 +169,10 @@ const useSettingsStore = defineStore(
 
     // 更新应用配置
     function updateSettings(data: Settings.all, fromBase = false) {
-      settings.value = defaultsDeep(data, fromBase ? settingsDefault : settings.value)
+      settings.value = defaultsDeep(
+        data,
+        fromBase ? settingsDefault : settings.value,
+      )
     }
 
     return {
