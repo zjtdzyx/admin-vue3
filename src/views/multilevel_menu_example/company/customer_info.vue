@@ -1,12 +1,21 @@
 <script setup lang="ts">
+import CustomerInfo from '@/components/company/CustomerInfo.vue'
+
 defineOptions({
-  name: 'CustomerInfo',
+  name: 'CustomerInfoView',
 })
 </script>
 
 <template>
   <div>
-    <h1>顾客信息管理</h1>
-    <!-- 你的代码 -->
+    <h1>Customer Info</h1>
+    <CustomerInfo />
   </div>
 </template>
+
+<style scoped>
+h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+</style>

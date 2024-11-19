@@ -1,21 +1,21 @@
 import api from '@/api/index'
 
-export async function fetchCustomerInfo() {
-  const response = await api.get('/customers')
-  return response.data
-}
-
 export async function createCustomer(customer) {
   const response = await api.post('/customers', customer)
   return response.data
 }
 
-export async function updateCustomer(customer) {
-  const response = await api.put(`/customers/${customer.id}`, customer)
+export async function getCustomer(customerNumber) {
+  const response = await api.get(`/customers/${customerNumber}`)
   return response.data
 }
 
-export async function deleteCustomer(customerId) {
-  const response = await api.delete(`/customers/${customerId}`)
+export async function updateCustomer(customerNumber, customer) {
+  const response = await api.put(`/customers/${customerNumber}`, customer)
+  return response.data
+}
+
+export async function deleteCustomer(customerNumber) {
+  const response = await api.delete(`/customers/${customerNumber}`)
   return response.data
 }

@@ -28,6 +28,9 @@ import 'virtual:uno.css'
 // 全局样式
 import '@/assets/styles/globals.css'
 
+// 引入 Mock 数据
+import '@/mock/mock'
+
 const app = createApp(App)
 app.use(FloatingVue, {
   distance: 12,

@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { useProductStore } from '@/store/product'
+import { useCustomerStore } from '@/store/customer'
 import { onMounted, ref } from 'vue'
 
-const productStore = useProductStore()
-const productInfo = ref([])
+const customerStore = useCustomerStore()
+const customerInfo = ref([])
 
 onMounted(async () => {
   try {
-    await productStore.loadProducts()
-    productInfo.value = productStore.products
+    await customerStore.loadCustomers()
+    customerInfo.value = customerStore.customers
   }
   catch (error) {
-    console.error('Failed to fetch product info:', error)
+    console.error('Failed to fetch customer info:', error)
   }
 })
 </script>
 
 <template>
   <div>
-    <h1>产品信息管理</h1>
+    <h1>顾客信息管理</h1>
     <ul>
-      <li v-for="product in productInfo" :key="product.id">
-        {{ product.name }}
+      <li v-for="customer in customerInfo" :key="customer.customerNumber">
+        {{ customer.name }}
       </li>
     </ul>
   </div>

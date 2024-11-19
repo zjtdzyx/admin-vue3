@@ -1,12 +1,21 @@
 <script setup lang="ts">
+import MaterialInventory from '@/components/purchasing_point/MaterialInventory.vue'
+
 defineOptions({
-  name: 'MaterialInventory',
+  name: 'PurchasingPointMaterialInventoryView',
 })
 </script>
 
 <template>
   <div>
-    <h1>代购点物质盘点</h1>
-    <!-- 你的代码 -->
+    <h1>物资盘点</h1>
+    <MaterialInventory />
   </div>
 </template>
+
+<style scoped>
+h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+</style>

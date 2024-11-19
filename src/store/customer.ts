@@ -1,4 +1,4 @@
-import { createCustomer, deleteCustomer, fetchCustomerInfo, updateCustomer } from '@/api/customer'
+import { createCustomer, deleteCustomer, getCustomer, updateCustomer } from '@/api/customer'
 import { defineStore } from 'pinia'
 
 export const useCustomerStore = defineStore('customer', {
@@ -6,23 +6,24 @@ export const useCustomerStore = defineStore('customer', {
     customers: [],
   }),
   actions: {
-    async loadCustomers() {
-      this.customers = await fetchCustomerInfo()
-    },
     async addCustomer(customer) {
       const newCustomer = await createCustomer(customer)
       this.customers.push(newCustomer)
     },
-    async editCustomer(customer) {
-      const updatedCustomer = await updateCustomer(customer)
-      const index = this.customers.findIndex(c => c.id === customer.id)
+    async fetchCustomer(customerNumber) {
+      const customer = await getCustomer(customerNumber)
+      return customer
+    },
+    async editCustomer(customerNumber, customer) {
+      const updatedCustomer = await updateCustomer(customerNumber, customer)
+      const index = this.customers.findIndex(c => c.customerNumber === customerNumber)
       if (index !== -1) {
         this.customers[index] = updatedCustomer
       }
     },
-    async removeCustomer(customerId) {
-      await deleteCustomer(customerId)
-      this.customers = this.customers.filter(c => c.id !== customerId)
+    async removeCustomer(customerNumber) {
+      await deleteCustomer(customerNumber)
+      this.customers = this.customers.filter(c => c.customerNumber !== customerNumber)
     },
   },
 })

@@ -1,12 +1,21 @@
 <script setup lang="ts">
+import MaterialIn from '@/components/production_base/MaterialIn.vue'
+
 defineOptions({
-  name: 'MaterialIn',
+  name: 'MaterialInView',
 })
 </script>
 
 <template>
   <div>
     <h1>物资入库</h1>
-    <!-- 你的代码 -->
+    <MaterialIn />
   </div>
 </template>
+
+<style scoped>
+h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+</style>

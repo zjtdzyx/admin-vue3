@@ -1,21 +1,21 @@
 import api from '@/api/index'
 
-export async function fetchFarmerInfo() {
-  const response = await api.get('/farmers')
-  return response.data
-}
-
 export async function createFarmer(farmer) {
   const response = await api.post('/farmers', farmer)
   return response.data
 }
 
-export async function updateFarmer(farmer) {
-  const response = await api.put(`/farmers/${farmer.id}`, farmer)
+export async function getFarmer(farmerNumber) {
+  const response = await api.get(`/farmers/${farmerNumber}`)
   return response.data
 }
 
-export async function deleteFarmer(farmerId) {
-  const response = await api.delete(`/farmers/${farmerId}`)
+export async function updateFarmer(farmerNumber, farmer) {
+  const response = await api.put(`/farmers/${farmerNumber}`, farmer)
+  return response.data
+}
+
+export async function deleteFarmer(farmerNumber) {
+  const response = await api.delete(`/farmers/${farmerNumber}`)
   return response.data
 }

@@ -20,8 +20,8 @@ onMounted(async () => {
   <div>
     <h1>公司机构设置</h1>
     <ul>
-      <li v-for="organization in organizationInfo" :key="organization.id">
-        {{ organization.name }}
+      <li v-for="organization in organizationInfo" :key="organization.organizationName">
+        {{ organization.organizationName }}
       </li>
     </ul>
   </div>

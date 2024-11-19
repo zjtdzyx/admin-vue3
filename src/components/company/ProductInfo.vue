@@ -20,7 +20,7 @@ onMounted(async () => {
   <div>
     <h1>产品信息管理</h1>
     <ul>
-      <li v-for="product in productInfo" :key="product.id">
+      <li v-for="product in productInfo" :key="product.productNumber">
         {{ product.name }}
       </li>
     </ul>

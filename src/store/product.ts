@@ -1,4 +1,4 @@
-import { createProduct, deleteProduct, fetchProductInfo, updateProduct } from '@/api/product'
+import { createProduct, deleteProduct, getProduct, updateProduct } from '@/api/product'
 import { defineStore } from 'pinia'
 
 export const useProductStore = defineStore('product', {
@@ -6,23 +6,24 @@ export const useProductStore = defineStore('product', {
     products: [],
   }),
   actions: {
-    async loadProducts() {
-      this.products = await fetchProductInfo()
-    },
     async addProduct(product) {
       const newProduct = await createProduct(product)
       this.products.push(newProduct)
     },
-    async editProduct(product) {
-      const updatedProduct = await updateProduct(product)
-      const index = this.products.findIndex(p => p.id === product.id)
+    async fetchProduct(productNumber) {
+      const product = await getProduct(productNumber)
+      return product
+    },
+    async editProduct(productNumber, product) {
+      const updatedProduct = await updateProduct(productNumber, product)
+      const index = this.products.findIndex(p => p.productNumber === productNumber)
       if (index !== -1) {
         this.products[index] = updatedProduct
       }
     },
-    async removeProduct(productId) {
-      await deleteProduct(productId)
-      this.products = this.products.filter(p => p.id !== productId)
+    async removeProduct(productNumber) {
+      await deleteProduct(productNumber)
+      this.products = this.products.filter(p => p.productNumber !== productNumber)
     },
   },
 })

@@ -1,4 +1,4 @@
-import { createFarmer, deleteFarmer, fetchFarmerInfo, updateFarmer } from '@/api/farmer'
+import { createFarmer, deleteFarmer, getFarmer, updateFarmer } from '@/api/farmer'
 import { defineStore } from 'pinia'
 
 export const useFarmerStore = defineStore('farmer', {
@@ -6,23 +6,24 @@ export const useFarmerStore = defineStore('farmer', {
     farmers: [],
   }),
   actions: {
-    async loadFarmers() {
-      this.farmers = await fetchFarmerInfo()
-    },
     async addFarmer(farmer) {
       const newFarmer = await createFarmer(farmer)
       this.farmers.push(newFarmer)
     },
-    async editFarmer(farmer) {
-      const updatedFarmer = await updateFarmer(farmer)
-      const index = this.farmers.findIndex(f => f.id === farmer.id)
+    async fetchFarmer(farmerNumber) {
+      const farmer = await getFarmer(farmerNumber)
+      return farmer
+    },
+    async editFarmer(farmerNumber, farmer) {
+      const updatedFarmer = await updateFarmer(farmerNumber, farmer)
+      const index = this.farmers.findIndex(f => f.farmerNumber === farmerNumber)
       if (index !== -1) {
         this.farmers[index] = updatedFarmer
       }
     },
-    async removeFarmer(farmerId) {
-      await deleteFarmer(farmerId)
-      this.farmers = this.farmers.filter(f => f.id !== farmerId)
+    async removeFarmer(farmerNumber) {
+      await deleteFarmer(farmerNumber)
+      this.farmers = this.farmers.filter(f => f.farmerNumber !== farmerNumber)
     },
   },
 })

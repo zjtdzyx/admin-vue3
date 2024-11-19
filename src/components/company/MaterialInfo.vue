@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { useProductStore } from '@/store/product'
+import { useMaterialStore } from '@/store/material'
 import { onMounted, ref } from 'vue'
 
-const productStore = useProductStore()
-const productInfo = ref([])
+const materialStore = useMaterialStore()
+const materialInfo = ref([])
 
 onMounted(async () => {
   try {
-    await productStore.loadProducts()
-    productInfo.value = productStore.products
+    await materialStore.loadMaterials()
+    materialInfo.value = materialStore.materials
   }
   catch (error) {
-    console.error('Failed to fetch product info:', error)
+    console.error('Failed to fetch material info:', error)
   }
 })
 </script>
 
 <template>
   <div>
-    <h1>产品信息管理</h1>
+    <h1>物资信息管理</h1>
     <ul>
-      <li v-for="product in productInfo" :key="product.id">
-        {{ product.name }}
+      <li v-for="material in materialInfo" :key="material.materialNumber">
+        {{ material.name }}
       </li>
     </ul>
   </div>
