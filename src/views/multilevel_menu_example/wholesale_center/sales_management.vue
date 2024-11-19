@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'BasicInfo',
+  name: 'SalesManagement',
 })
 </script>
 
 <template>
   <div>
-    <h1>基本信息设置</h1>
+    <h1>销售单管理</h1>
     <!-- 你的代码 -->
   </div>
 </template>

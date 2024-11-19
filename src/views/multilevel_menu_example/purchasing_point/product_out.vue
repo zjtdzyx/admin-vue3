@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'InventoryQuery',
+  name: 'ProductOut',
 })
 </script>
 
 <template>
   <div>
-    <h1>产品库存查询</h1>
+    <h1>产品出库</h1>
     <!-- 你的代码 -->
   </div>
 </template>

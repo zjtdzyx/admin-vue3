@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'StatisticsAnalysis',
+  name: 'ProductInfo',
 })
 </script>
 
 <template>
   <div>
-    <h1>统计分析</h1>
+    <h1>产品信息管理</h1>
     <!-- 你的代码 -->
   </div>
 </template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 defineOptions({
-  name: 'ProductInventory',
+  name: 'FarmerInfo',
 })
 </script>
 
 <template>
   <div>
-    <h1>生产基地产品盘点</h1>
+    <h1>农户信息管理</h1>
     <!-- 你的代码 -->
   </div>
 </template>
