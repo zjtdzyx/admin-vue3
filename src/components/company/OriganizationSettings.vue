@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useOrganizationStore } from '@/store/organization'
-import { ElButton, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
+import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
@@ -57,39 +57,45 @@ async function removeOrganization(organization_number) {
 </script>
 
 <template>
-  <div>
-    <h1>组织信息管理</h1>
-    <ElForm label-width="120px" @submit.prevent="addOrganization">
-      <ElFormItem label="组织编号">
-        <ElInput v-model="newOrganization.organization_number" placeholder="组织编号" required />
-      </ElFormItem>
-      <ElFormItem label="组织名称">
-        <ElInput v-model="newOrganization.organization_name" placeholder="组织名称" required />
-      </ElFormItem>
-      <ElFormItem label="类型">
-        <ElInput v-model="newOrganization.type" placeholder="类型" required />
-      </ElFormItem>
-      <ElFormItem>
-        <ElButton type="primary" @click="addOrganization">
-          添加组织
-        </ElButton>
-      </ElFormItem>
-    </ElForm>
-    <ElTable :data="organizationInfo" style="width: 100%;">
-      <ElTableColumn prop="organization_number" label="组织编号" width="180" />
-      <ElTableColumn prop="organization_name" label="组织名称" width="180" />
-      <ElTableColumn prop="type" label="类型" width="180" />
-      <ElTableColumn label="操作">
-        <template #default="scope">
-          <ElButton type="primary" size="small" @click="editOrganization(scope.row)">
-            编辑
+  <div class="container">
+    <ElCard class="box-card">
+      <div class="card-header">
+        <h1>公司机构信息管理</h1>
+      </div>
+      <ElForm label-width="120px" @submit.prevent="addOrganization">
+        <ElFormItem label="组织编号">
+          <ElInput v-model="newOrganization.organization_number" placeholder="组织编号" required />
+        </ElFormItem>
+        <ElFormItem label="组织名称">
+          <ElInput v-model="newOrganization.organization_name" placeholder="组织名称" required />
+        </ElFormItem>
+        <ElFormItem label="类型">
+          <ElInput v-model="newOrganization.type" placeholder="类型" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="addOrganization">
+            添加组织
           </ElButton>
-          <ElButton type="danger" size="small" @click="removeOrganization(scope.row.organization_number)">
-            删除
-          </ElButton>
-        </template>
-      </ElTableColumn>
-    </ElTable>
+        </ElFormItem>
+      </ElForm>
+      <div class="table-container">
+        <ElTable :data="organizationInfo" style="width: auto; margin: 0 auto;" height="400" border>
+          <ElTableColumn prop="organization_number" label="组织编号" width="150" />
+          <ElTableColumn prop="organization_name" label="组织名称" width="150" />
+          <ElTableColumn prop="type" label="类型" width="150" />
+          <ElTableColumn label="操作" width="150">
+            <template #default="scope">
+              <ElButton type="primary" size="small" @click="editOrganization(scope.row)">
+                编辑
+              </ElButton>
+              <ElButton type="danger" size="small" @click="removeOrganization(scope.row.organization_number)">
+                删除
+              </ElButton>
+            </template>
+          </ElTableColumn>
+        </ElTable>
+      </div>
+    </ElCard>
     <div v-if="editingOrganization">
       <h2>编辑组织</h2>
       <ElForm label-width="120px" @submit.prevent="updateOrganization">
@@ -102,7 +108,7 @@ async function removeOrganization(organization_number) {
         <ElFormItem label="类型">
           <ElInput v-model="editingOrganization.type" placeholder="类型" required />
         </ElFormItem>
-        <ElFormItem>
+        <ElFormItem class="form-actions">
           <ElButton type="primary" @click="updateOrganization">
             更新组织
           </ElButton>
@@ -116,7 +122,44 @@ async function removeOrganization(organization_number) {
 </template>
 
 <style scoped>
-  h1 {
-    margin-bottom: 16px;
-  }
+.container {
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.el-table th,
+ .el-table td {
+  padding: 8px !important;
+  border-right: 1px solid #ebeef5;
+}
+
+.el-table th:last-child,
+ .el-table td:last-child {
+  border-right: none;
+}
+
+.box-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+}
 </style>

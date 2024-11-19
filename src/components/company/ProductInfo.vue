@@ -1,129 +1,172 @@
 <script setup lang="ts">
-import { useCustomerStore } from '@/store/customer'
-import { ElButton, ElDialog, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
+import { useProductStore } from '@/store/product'
+import { ElButton, ElCard, ElDatePicker, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const customerStore = useCustomerStore()
-const customerInfo = ref([])
-const newCustomer = ref({ customer_number: '', name: '', contact: '', address: '' })
-const editingCustomer = ref<{ customer_number: string, name: string, contact: string, address: string } | null>(null)
-const showAddDialog = ref(false)
+const productStore = useProductStore()
+const productInfo = ref([])
+const newProduct = ref({ product_number: '', name: '', grade: '', origin: '', cost_price: '', packaging: '', inbound_date: '', quantity: '', auditedCount: '', systemCount: '', difference: '' })
+const editingProduct = ref<{ product_number: string, name: string, grade: string, origin: string, cost_price: string, packaging: string, inbound_date: string, quantity: string, auditedCount: string, systemCount: string, difference: string } | null>(null)
 
 onMounted(async () => {
   try {
-    await customerStore.loadCustomers()
-    customerInfo.value = customerStore.customers
+    await productStore.loadProducts()
+    productInfo.value = productStore.products
   }
   catch {
-    ElMessage.error('Failed to fetch customer info')
+    ElMessage.error('Failed to fetch product info')
   }
 })
 
-async function addCustomer() {
+async function addProduct() {
   try {
-    await customerStore.addCustomer(newCustomer.value)
-    newCustomer.value = { customer_number: '', name: '', contact: '', address: '' }
-    showAddDialog.value = false
-    ElMessage.success('Customer added successfully')
+    await productStore.addProduct(newProduct.value)
+    newProduct.value = { product_number: '', name: '', grade: '', origin: '', cost_price: '', packaging: '', inbound_date: '', quantity: '', auditedCount: '', systemCount: '', difference: '' }
+    ElMessage.success('Product added successfully')
   }
   catch {
-    ElMessage.error('Failed to add customer')
+    ElMessage.error('Failed to add product')
   }
 }
 
-function editCustomer(customer) {
-  editingCustomer.value = { ...customer }
+function editProduct(product) {
+  editingProduct.value = { ...product }
 }
 
-async function updateCustomer() {
+async function updateProduct() {
   try {
-    await customerStore.editCustomer(editingCustomer.value.customer_number, editingCustomer.value)
-    editingCustomer.value = null
-    ElMessage.success('Customer updated successfully')
+    await productStore.editProduct(editingProduct.value.product_number, editingProduct.value)
+    editingProduct.value = null
+    ElMessage.success('Product updated successfully')
   }
   catch {
-    ElMessage.error('Failed to update customer')
+    ElMessage.error('Failed to update product')
   }
 }
 
-async function removeCustomer(customer_number) {
+async function removeProduct(product_number) {
   try {
-    await customerStore.removeCustomer(customer_number)
-    ElMessage.success('Customer removed successfully')
+    await productStore.removeProduct(product_number)
+    ElMessage.success('Product removed successfully')
   }
   catch {
-    ElMessage.error('Failed to remove customer')
+    ElMessage.error('Failed to remove product')
   }
 }
 </script>
 
 <template>
-  <div>
-    <h1>顾客信息管理</h1>
-    <ElButton type="primary" @click="showAddDialog = true">
-      添加客户
-    </ElButton>
-    <ElDialog v-model:visible="showAddDialog" title="添加客户">
-      <ElForm label-width="120px" @submit.prevent="addCustomer">
-        <ElFormItem label="客户编号">
-          <ElInput v-model="newCustomer.customer_number" placeholder="客户编号" required />
+  <div class="container">
+    <ElCard class="box-card">
+      <div class="card-header">
+        <h1>产品信息管理</h1>
+      </div>
+      <ElForm label-width="120px" @submit.prevent="addProduct">
+        <ElFormItem label="产品编号">
+          <ElInput v-model="newProduct.product_number" placeholder="产品编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
-          <ElInput v-model="newCustomer.name" placeholder="名称" required />
+          <ElInput v-model="newProduct.name" placeholder="名称" required />
         </ElFormItem>
-        <ElFormItem label="联系人">
-          <ElInput v-model="newCustomer.contact" placeholder="联系人" required />
+        <ElFormItem label="等级">
+          <ElInput v-model="newProduct.grade" placeholder="等级" required />
         </ElFormItem>
-        <ElFormItem label="地址">
-          <ElInput v-model="newCustomer.address" placeholder="地址" required />
+        <ElFormItem label="产地">
+          <ElInput v-model="newProduct.origin" placeholder="产地" required />
         </ElFormItem>
-        <ElFormItem>
-          <ElButton type="primary" @click="addCustomer">
-            提交
-          </ElButton>
-          <ElButton @click="showAddDialog = false">
-            取消
+        <ElFormItem label="成本价">
+          <ElInput v-model="newProduct.cost_price" placeholder="成本价" required />
+        </ElFormItem>
+        <ElFormItem label="包装">
+          <ElInput v-model="newProduct.packaging" placeholder="包装" required />
+        </ElFormItem>
+        <ElFormItem label="入库日期">
+          <ElDatePicker v-model="newProduct.inbound_date" placeholder="入库日期" required />
+        </ElFormItem>
+        <ElFormItem label="数量">
+          <ElInput v-model="newProduct.quantity" placeholder="数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点前数量">
+          <ElInput v-model="newProduct.auditedCount" placeholder="盘点前数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点后数量">
+          <ElInput v-model="newProduct.systemCount" placeholder="盘点后数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点前后差异">
+          <ElInput v-model="newProduct.difference" placeholder="盘点前后差异" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="addProduct">
+            添加产品
           </ElButton>
         </ElFormItem>
       </ElForm>
-    </ElDialog>
-    <ElTable :data="customerInfo" style="width: 100%;">
-      <ElTableColumn prop="customer_number" label="客户编号" width="180" />
-      <ElTableColumn prop="name" label="名称" width="180" />
-      <ElTableColumn prop="contact" label="联系人" width="180" />
-      <ElTableColumn prop="address" label="地址" width="180" />
-      <ElTableColumn label="操作">
-        <template #default="scope">
-          <ElButton type="primary" size="small" @click="editCustomer(scope.row)">
-            编辑
-          </ElButton>
-          <ElButton type="danger" size="small" @click="removeCustomer(scope.row.customer_number)">
-            删除
-          </ElButton>
-        </template>
-      </ElTableColumn>
-    </ElTable>
-    <div v-if="editingCustomer">
-      <h2>编辑客户</h2>
-      <ElForm label-width="120px" @submit.prevent="updateCustomer">
-        <ElFormItem label="客户编号">
-          <ElInput v-model="editingCustomer.customer_number" placeholder="客户编号" required />
+      <ElTable :data="productInfo" style="width: 100%; overflow-x: auto;" height="400" border>
+        <ElTableColumn prop="product_number" label="产品编号" width="150" />
+        <ElTableColumn prop="name" label="名称" width="150" />
+        <ElTableColumn prop="grade" label="等级" width="150" />
+        <ElTableColumn prop="origin" label="产地" width="150" />
+        <ElTableColumn prop="cost_price" label="成本价" width="150" />
+        <ElTableColumn prop="packaging" label="包装" width="150" />
+        <ElTableColumn prop="inbound_date" label="入库日期" width="150" />
+        <ElTableColumn prop="quantity" label="数量" width="150" />
+        <ElTableColumn prop="auditedCount" label="盘点前数量" width="150" />
+        <ElTableColumn prop="systemCount" label="盘点后数量" width="150" />
+        <ElTableColumn prop="difference" label="盘点前后差异" width="150" />
+        <ElTableColumn label="操作" width="150">
+          <template #default="scope">
+            <ElButton type="primary" size="small" @click="editProduct(scope.row)">
+              编辑
+            </ElButton>
+            <ElButton type="danger" size="small" @click="removeProduct(scope.row.product_number)">
+              删除
+            </ElButton>
+          </template>
+        </ElTableColumn>
+      </ElTable>
+    </ElCard>
+    <div v-if="editingProduct">
+      <h2>编辑产品</h2>
+      <ElForm label-width="120px" @submit.prevent="updateProduct">
+        <ElFormItem label="产品编号">
+          <ElInput v-model="editingProduct.product_number" placeholder="产品编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
-          <ElInput v-model="editingCustomer.name" placeholder="名称" required />
+          <ElInput v-model="editingProduct.name" placeholder="名称" required />
         </ElFormItem>
-        <ElFormItem label="联系人">
-          <ElInput v-model="editingCustomer.contact" placeholder="联系人" required />
+        <ElFormItem label="等级">
+          <ElInput v-model="editingProduct.grade" placeholder="等级" required />
         </ElFormItem>
-        <ElFormItem label="地址">
-          <ElInput v-model="editingCustomer.address" placeholder="地址" required />
+        <ElFormItem label="产地">
+          <ElInput v-model="editingProduct.origin" placeholder="产地" required />
         </ElFormItem>
-        <ElFormItem>
-          <ElButton type="primary" @click="updateCustomer">
-            更新客户
+        <ElFormItem label="成本价">
+          <ElInput v-model="editingProduct.cost_price" placeholder="成本价" required />
+        </ElFormItem>
+        <ElFormItem label="包装">
+          <ElInput v-model="editingProduct.packaging" placeholder="包装" required />
+        </ElFormItem>
+        <ElFormItem label="入库日期">
+          <ElDatePicker v-model="editingProduct.inbound_date" placeholder="入库日期" required />
+        </ElFormItem>
+        <ElFormItem label="数量">
+          <ElInput v-model="editingProduct.quantity" placeholder="数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点前数量">
+          <ElInput v-model="editingProduct.auditedCount" placeholder="盘点前数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点后数量">
+          <ElInput v-model="editingProduct.systemCount" placeholder="盘点后数量" required />
+        </ElFormItem>
+        <ElFormItem label="盘点前后差异">
+          <ElInput v-model="editingProduct.difference" placeholder="盘点前后差异" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="updateProduct">
+            更新产品
           </ElButton>
-          <ElButton @click="editingCustomer = null">
+          <ElButton @click="editingProduct = null">
             取消
           </ElButton>
         </ElFormItem>
@@ -133,7 +176,39 @@ async function removeCustomer(customer_number) {
 </template>
 
 <style scoped>
+.container {
+  padding: 20px;
+}
+
 h1 {
   margin-bottom: 16px;
+  text-align: center;
+}
+
+.el-table th,
+ .el-table td {
+  padding: 8px !important;
+  border-right: 1px solid #ebeef5;
+}
+
+.el-table th:last-child,
+ .el-table td:last-child {
+  border-right: none;
+}
+
+.box-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

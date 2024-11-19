@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMaterialStore } from '@/store/material'
-import { ElButton, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
+import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
@@ -57,56 +57,62 @@ async function removeMaterial(material_number) {
 </script>
 
 <template>
-  <div>
-    <h1>材料信息管理</h1>
-    <ElForm label-width="120px" @submit.prevent="addMaterial">
-      <ElFormItem label="材料编号">
-        <ElInput v-model="newMaterial.material_number" placeholder="材料编号" required />
-      </ElFormItem>
-      <ElFormItem label="名称">
-        <ElInput v-model="newMaterial.name" placeholder="名称" required />
-      </ElFormItem>
-      <ElFormItem label="单位">
-        <ElInput v-model="newMaterial.unit" placeholder="单位" required />
-      </ElFormItem>
-      <ElFormItem label="成本价">
-        <ElInput v-model="newMaterial.cost_price" placeholder="成本价" required />
-      </ElFormItem>
-      <ElFormItem label="销售价">
-        <ElInput v-model="newMaterial.selling_price" placeholder="销售价" required />
-      </ElFormItem>
-      <ElFormItem label="数量">
-        <ElInput v-model="newMaterial.quantity" placeholder="数量" required />
-      </ElFormItem>
-      <ElFormItem>
-        <ElButton type="primary" @click="addMaterial">
-          添加材料
-        </ElButton>
-      </ElFormItem>
-    </ElForm>
-    <ElTable :data="materialInfo" style="width: 100%;">
-      <ElTableColumn prop="material_number" label="材料编号" width="180" />
-      <ElTableColumn prop="name" label="名称" width="180" />
-      <ElTableColumn prop="unit" label="单位" width="180" />
-      <ElTableColumn prop="cost_price" label="成本价" width="180" />
-      <ElTableColumn prop="selling_price" label="销售价" width="180" />
-      <ElTableColumn prop="quantity" label="数量" width="180" />
-      <ElTableColumn label="操作">
-        <template #default="scope">
-          <ElButton type="primary" size="small" @click="editMaterial(scope.row)">
-            编辑
+  <div class="container">
+    <ElCard class="box-card">
+      <div class="card-header">
+        <h1>物资信息管理</h1>
+      </div>
+      <ElForm label-width="120px" @submit.prevent="addMaterial">
+        <ElFormItem label="物资编号">
+          <ElInput v-model="newMaterial.material_number" placeholder="物资编号" required />
+        </ElFormItem>
+        <ElFormItem label="名称">
+          <ElInput v-model="newMaterial.name" placeholder="名称" required />
+        </ElFormItem>
+        <ElFormItem label="单位">
+          <ElInput v-model="newMaterial.unit" placeholder="单位" required />
+        </ElFormItem>
+        <ElFormItem label="成本价">
+          <ElInput v-model="newMaterial.cost_price" placeholder="成本价" required />
+        </ElFormItem>
+        <ElFormItem label="销售价">
+          <ElInput v-model="newMaterial.selling_price" placeholder="销售价" required />
+        </ElFormItem>
+        <ElFormItem label="数量">
+          <ElInput v-model="newMaterial.quantity" placeholder="数量" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="addMaterial">
+            添加物资
           </ElButton>
-          <ElButton type="danger" size="small" @click="removeMaterial(scope.row.material_number)">
-            删除
-          </ElButton>
-        </template>
-      </ElTableColumn>
-    </ElTable>
+        </ElFormItem>
+      </ElForm>
+      <div class="table-container">
+        <ElTable :data="materialInfo" style="width: auto; margin: 0 auto;" height="400" border>
+          <ElTableColumn prop="material_number" label="物资编号" width="150" />
+          <ElTableColumn prop="name" label="名称" width="150" />
+          <ElTableColumn prop="unit" label="单位" width="150" />
+          <ElTableColumn prop="cost_price" label="成本价" width="150" />
+          <ElTableColumn prop="selling_price" label="销售价" width="150" />
+          <ElTableColumn prop="quantity" label="数量" width="150" />
+          <ElTableColumn label="操作" width="150">
+            <template #default="scope">
+              <ElButton type="primary" size="small" @click="editMaterial(scope.row)">
+                编辑
+              </ElButton>
+              <ElButton type="danger" size="small" @click="removeMaterial(scope.row.material_number)">
+                删除
+              </ElButton>
+            </template>
+          </ElTableColumn>
+        </ElTable>
+      </div>
+    </ElCard>
     <div v-if="editingMaterial">
-      <h2>编辑材料</h2>
+      <h2>编辑物资</h2>
       <ElForm label-width="120px" @submit.prevent="updateMaterial">
-        <ElFormItem label="材料编号">
-          <ElInput v-model="editingMaterial.material_number" placeholder="材料编号" required />
+        <ElFormItem label="物资编号">
+          <ElInput v-model="editingMaterial.material_number" placeholder="物资编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
           <ElInput v-model="editingMaterial.name" placeholder="名称" required />
@@ -123,9 +129,9 @@ async function removeMaterial(material_number) {
         <ElFormItem label="数量">
           <ElInput v-model="editingMaterial.quantity" placeholder="数量" required />
         </ElFormItem>
-        <ElFormItem>
+        <ElFormItem class="form-actions">
           <ElButton type="primary" @click="updateMaterial">
-            更新材料
+            更新物资
           </ElButton>
           <ElButton @click="editingMaterial = null">
             取消
@@ -137,7 +143,44 @@ async function removeMaterial(material_number) {
 </template>
 
 <style scoped>
+.container {
+  padding: 20px;
+}
+
 h1 {
   margin-bottom: 16px;
+  text-align: center;
+}
+
+.el-table th,
+ .el-table td {
+  padding: 8px !important;
+  border-right: 1px solid #ebeef5;
+}
+
+.el-table th:last-child,
+ .el-table td:last-child {
+  border-right: none;
+}
+
+.box-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
 }
 </style>

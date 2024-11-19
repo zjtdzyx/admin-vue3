@@ -1,126 +1,125 @@
 <script setup lang="ts">
-import { useFarmerStore } from '@/store/farmer'
-import { ElButton, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
+import { useCustomerStore } from '@/store/customer'
+import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const farmerStore = useFarmerStore()
-const farmerInfo = ref([])
-const newFarmer = ref({ farmer_number: '', name: '', address: '', contact: '', sowing_area: '' })
-const editingFarmer = ref<{ farmer_number: string, name: string, address: string, contact: string, sowing_area: string } | null>(null)
+const customerStore = useCustomerStore()
+const customerInfo = ref([])
+const newCustomer = ref({ customer_number: '', name: '', contact: '', address: '' })
+const editingCustomer = ref<{ customer_number: string, name: string, contact: string, address: string } | null>(null)
 
 onMounted(async () => {
   try {
-    await farmerStore.loadFarmers()
-    farmerInfo.value = farmerStore.farmers
+    await customerStore.loadCustomers()
+    customerInfo.value = customerStore.customers
   }
   catch {
-    ElMessage.error('Failed to fetch farmer info')
+    ElMessage.error('Failed to fetch customer info')
   }
 })
 
-async function addFarmer() {
+async function addCustomer() {
   try {
-    await farmerStore.addFarmer(newFarmer.value)
-    newFarmer.value = { farmer_number: '', name: '', address: '', contact: '', sowing_area: '' }
-    ElMessage.success('Farmer added successfully')
+    await customerStore.addCustomer(newCustomer.value)
+    newCustomer.value = { customer_number: '', name: '', contact: '', address: '' }
+    ElMessage.success('Customer added successfully')
   }
   catch {
-    ElMessage.error('Failed to add farmer')
+    ElMessage.error('Failed to add customer')
   }
 }
 
-function editFarmer(farmer) {
-  editingFarmer.value = { ...farmer }
+function editCustomer(customer) {
+  editingCustomer.value = { ...customer }
 }
 
-async function updateFarmer() {
+async function updateCustomer() {
   try {
-    await farmerStore.editFarmer(editingFarmer.value.farmer_number, editingFarmer.value)
-    editingFarmer.value = null
-    ElMessage.success('Farmer updated successfully')
+    await customerStore.editCustomer(editingCustomer.value.customer_number, editingCustomer.value)
+    editingCustomer.value = null
+    ElMessage.success('Customer updated successfully')
   }
   catch {
-    ElMessage.error('Failed to update farmer')
+    ElMessage.error('Failed to update customer')
   }
 }
 
-async function removeFarmer(farmer_number) {
+async function removeCustomer(customer_number) {
   try {
-    await farmerStore.removeFarmer(farmer_number)
-    ElMessage.success('Farmer removed successfully')
+    await customerStore.removeCustomer(customer_number)
+    ElMessage.success('Customer removed successfully')
   }
   catch {
-    ElMessage.error('Failed to remove farmer')
+    ElMessage.error('Failed to remove customer')
   }
 }
 </script>
 
 <template>
-  <div>
-    <h1>农户信息管理</h1>
-    <ElForm label-width="120px" @submit.prevent="addFarmer">
-      <ElFormItem label="农民编号">
-        <ElInput v-model="newFarmer.farmer_number" placeholder="农民编号" required />
-      </ElFormItem>
-      <ElFormItem label="名称">
-        <ElInput v-model="newFarmer.name" placeholder="名称" required />
-      </ElFormItem>
-      <ElFormItem label="地址">
-        <ElInput v-model="newFarmer.address" placeholder="地址" required />
-      </ElFormItem>
-      <ElFormItem label="联系人">
-        <ElInput v-model="newFarmer.contact" placeholder="联系人" required />
-      </ElFormItem>
-      <ElFormItem label="播种面积">
-        <ElInput v-model="newFarmer.sowing_area" placeholder="播种面积" required />
-      </ElFormItem>
-      <ElFormItem>
-        <ElButton type="primary" @click="addFarmer">
-          添加农民
-        </ElButton>
-      </ElFormItem>
-    </ElForm>
-    <ElTable :data="farmerInfo" style="width: 100%;">
-      <ElTableColumn prop="farmer_number" label="农民编号" width="180" />
-      <ElTableColumn prop="name" label="名称" width="180" />
-      <ElTableColumn prop="address" label="地址" width="180" />
-      <ElTableColumn prop="contact" label="联系人" width="180" />
-      <ElTableColumn prop="sowing_area" label="播种面积" width="180" />
-      <ElTableColumn label="操作">
-        <template #default="scope">
-          <ElButton type="primary" size="small" @click="editFarmer(scope.row)">
-            编辑
-          </ElButton>
-          <ElButton type="danger" size="small" @click="removeFarmer(scope.row.farmer_number)">
-            删除
-          </ElButton>
-        </template>
-      </ElTableColumn>
-    </ElTable>
-    <div v-if="editingFarmer">
-      <h2>编辑农民</h2>
-      <ElForm label-width="120px" @submit.prevent="updateFarmer">
-        <ElFormItem label="农民编号">
-          <ElInput v-model="editingFarmer.farmer_number" placeholder="农民编号" required />
+  <div class="container">
+    <ElCard class="box-card">
+      <div class="card-header">
+        <h1>顾客信息管理</h1>
+      </div>
+      <ElForm label-width="120px" @submit.prevent="addCustomer">
+        <ElFormItem label="客户编号">
+          <ElInput v-model="newCustomer.customer_number" placeholder="客户编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
-          <ElInput v-model="editingFarmer.name" placeholder="名称" required />
-        </ElFormItem>
-        <ElFormItem label="地址">
-          <ElInput v-model="editingFarmer.address" placeholder="地址" required />
+          <ElInput v-model="newCustomer.name" placeholder="名称" required />
         </ElFormItem>
         <ElFormItem label="联系人">
-          <ElInput v-model="editingFarmer.contact" placeholder="联系人" required />
+          <ElInput v-model="newCustomer.contact" placeholder="联系人" required />
         </ElFormItem>
-        <ElFormItem label="播种面积">
-          <ElInput v-model="editingFarmer.sowing_area" placeholder="播种面积" required />
+        <ElFormItem label="地址">
+          <ElInput v-model="newCustomer.address" placeholder="地址" required />
         </ElFormItem>
-        <ElFormItem>
-          <ElButton type="primary" @click="updateFarmer">
-            更新农民
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="addCustomer">
+            添加客户
           </ElButton>
-          <ElButton @click="editingFarmer = null">
+        </ElFormItem>
+      </ElForm>
+      <div class="table-container">
+        <ElTable :data="customerInfo" style="width: auto; margin: 0 auto;" height="400" border>
+          <ElTableColumn prop="customer_number" label="客户编号" width="150" />
+          <ElTableColumn prop="name" label="名称" width="150" />
+          <ElTableColumn prop="contact" label="联系人" width="150" />
+          <ElTableColumn prop="address" label="地址" width="150" />
+          <ElTableColumn label="操作" width="150">
+            <template #default="scope">
+              <ElButton type="primary" size="small" @click="editCustomer(scope.row)">
+                编辑
+              </ElButton>
+              <ElButton type="danger" size="small" @click="removeCustomer(scope.row.customer_number)">
+                删除
+              </ElButton>
+            </template>
+          </ElTableColumn>
+        </ElTable>
+      </div>
+    </ElCard>
+    <div v-if="editingCustomer">
+      <h2>编辑客户</h2>
+      <ElForm label-width="120px" @submit.prevent="updateCustomer">
+        <ElFormItem label="客户编号">
+          <ElInput v-model="editingCustomer.customer_number" placeholder="客户编号" required />
+        </ElFormItem>
+        <ElFormItem label="名称">
+          <ElInput v-model="editingCustomer.name" placeholder="名称" required />
+        </ElFormItem>
+        <ElFormItem label="联系人">
+          <ElInput v-model="editingCustomer.contact" placeholder="联系人" required />
+        </ElFormItem>
+        <ElFormItem label="地址">
+          <ElInput v-model="editingCustomer.address" placeholder="地址" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="updateCustomer">
+            更新客户
+          </ElButton>
+          <ElButton @click="editingCustomer = null">
             取消
           </ElButton>
         </ElFormItem>
@@ -130,7 +129,44 @@ async function removeFarmer(farmer_number) {
 </template>
 
 <style scoped>
+.container {
+  padding: 20px;
+}
+
 h1 {
   margin-bottom: 16px;
+  text-align: center;
+}
+
+.el-table th,
+ .el-table td {
+  padding: 8px !important;
+  border-right: 1px solid #ebeef5;
+}
+
+.el-table th:last-child,
+ .el-table td:last-child {
+  border-right: none;
+}
+
+.box-card {
+  margin-bottom: 20px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
 }
 </style>
