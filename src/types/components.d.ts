@@ -52,8 +52,8 @@ declare module 'vue' {
     SalesManagement: typeof import('./../components/wholesale_center/SalesManagement.vue')['default']
     SearchBar: typeof import('./../components/SearchBar/index.vue')['default']
     SvgIcon: typeof import('./../components/SvgIcon/index.vue')['default']
-    SyetemSettings: typeof import('./../components/company/SyetemSettings.vue')['default']
     SystemInfo: typeof import('./../components/SystemInfo/index.vue')['default']
+    SystemSettings: typeof import('./../components/company/SystemSettings.vue')['default']
     Trend: typeof import('./../components/Trend/index.vue')['default']
   }
 }

@@ -8,14 +8,13 @@ defineOptions({
 
 <template>
   <div>
-    <h1>农户信息管理</h1>
     <FarmerInfo />
   </div>
 </template>
 
 <style scoped>
 h1 {
-  font-size: 24px;
   margin-bottom: 16px;
+  font-size: 24px;
 }
 </style>

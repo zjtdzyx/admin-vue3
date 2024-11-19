@@ -10,7 +10,7 @@ onMounted(async () => {
     await systemStore.loadSystemSettings()
     systemSettings.value = systemStore.settings
   }
-  catch (error) {
+  catch {
     console.error('Failed to fetch system settings:', error)
   }
 })

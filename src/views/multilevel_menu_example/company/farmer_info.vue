@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import MaterialInfo from '@/components/company/MaterialInfo.vue'
+import FarmerInfo from '@/components/company/FarmerInfo.vue'
 
 defineOptions({
-  name: 'MaterialInfoView',
+  name: 'FarmerInfoView',
 })
 </script>
 
 <template>
   <div>
-    <h1>物资信息管理</h1>
-    <MaterialInfo />
+    <FarmerInfo />
   </div>
 </template>
 
 <style scoped>
-h1 {
-  font-size: 24px;
-  margin-bottom: 16px;
-}
+  h1 {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
 </style>

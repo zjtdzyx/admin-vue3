@@ -8,14 +8,13 @@ defineOptions({
 
 <template>
   <div>
-    <h1>物资盘点</h1>
     <MaterialInventory />
   </div>
 </template>
 
 <style scoped>
 h1 {
-  font-size: 24px;
   margin-bottom: 16px;
+  font-size: 24px;
 }
 </style>

@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import MaterialInfo from '@/components/company/MaterialInfo.vue'
+import ProductionInfoQuery from '@/components/wholesale_center/ProductionInfoQuery.vue'
 
 defineOptions({
-  name: 'MaterialInfoView',
+  name: 'ProductionInfoQueryView',
 })
 </script>
 
 <template>
   <div>
-    <h1>物资信息管理</h1>
-    <MaterialInfo />
+    <ProductionInfoQuery />
   </div>
 </template>
 
 <style scoped>
 h1 {
-  font-size: 24px;
   margin-bottom: 16px;
+  font-size: 24px;
 }
 </style>

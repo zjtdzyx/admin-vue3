@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import CustomerInfo from '@/components/company/CustomerInfo.vue'
+import ProductInfo from '@/components/company/ProductInfo.vue'
 
 defineOptions({
-  name: 'CustomerInfoView',
+  name: 'ProductInfoView',
 })
 </script>
 
 <template>
   <div>
-    <h1>顾客信息管理</h1>
-    <CustomerInfo />
+    <ProductInfo />
   </div>
 </template>
 
 <style scoped>
 h1 {
-  font-size: 24px;
   margin-bottom: 16px;
+  font-size: 24px;
 }
 </style>
