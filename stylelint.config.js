@@ -28,8 +28,7 @@ export default {
       },
     ],
     'scss/at-import-partial-extension-blacklist': null, // 新规则
-    'scss/operator-no-newline-after': null, // 修复错误
   },
   allowEmptyInput: true,
   ignoreFiles: ['node_modules/**/*', 'dist*/**/*'],
-};
+}
