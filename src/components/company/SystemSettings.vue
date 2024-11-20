@@ -1,51 +1,56 @@
 <script setup lang="ts">
-import { useSystemStore } from '@/store/system'
-import { ElButton, ElCard, ElMessage, ElTable, ElTableColumn } from 'element-plus'
+import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const systemStore = useSystemStore()
-const systemSettings = ref([])
+const userInfo = ref([
+  { user_id: 'U001', username: 'admin', created_at: '2023-01-01', last_login_time: '2023-01-10', status: '启用' },
+  { user_id: 'U002', username: 'user', created_at: '2023-02-01', last_login_time: '2023-02-10', status: '禁用' },
+])
+const newUser = ref({ user_id: '', username: '', created_at: '', last_login_time: '', status: '' })
+const editingUser = ref<{ user_id: string, username: string, created_at: string, last_login_time: string, status: string } | null>(null)
 
-onMounted(async () => {
-  try {
-    await systemStore.loadSystemSettings()
-    systemSettings.value = systemStore.settings
-  }
-  catch {
-    ElMessage.error('Failed to fetch system settings')
-  }
+onMounted(() => {
+  // 模拟获取用户信息
+  ElMessage.success('User info loaded successfully')
 })
 
-function viewDetails(_user) {
-  // 查看详情逻辑
-}
-
-function editUser(_user) {
-  // 编辑用户逻辑
-}
-
-async function deleteUser(userId) {
+function addUserHandler() {
   try {
-    await systemStore.deleteUser(userId)
-    ElMessage.success('User deleted successfully')
+    userInfo.value.push({ ...newUser.value })
+    newUser.value = { user_id: '', username: '', created_at: '', last_login_time: '', status: '' }
+    ElMessage.success('User added successfully')
   }
   catch {
-    ElMessage.error('Failed to delete user')
+    ElMessage.error('Failed to add user')
   }
 }
 
-function resetPassword(_user) {
-  // 重置密码逻辑
+function editUserHandler(user) {
+  editingUser.value = { ...user }
 }
 
-async function toggleStatus(user) {
+function updateUserHandler() {
   try {
-    await systemStore.toggleUserStatus(user.id)
-    ElMessage.success('User status updated successfully')
+    const index = userInfo.value.findIndex(u => u.user_id === editingUser.value.user_id)
+    if (index !== -1) {
+      userInfo.value[index] = { ...editingUser.value }
+    }
+    editingUser.value = null
+    ElMessage.success('User updated successfully')
   }
   catch {
-    ElMessage.error('Failed to update user status')
+    ElMessage.error('Failed to update user')
+  }
+}
+
+function removeUserHandler(user_id) {
+  try {
+    userInfo.value = userInfo.value.filter(u => u.user_id !== user_id)
+    ElMessage.success('User removed successfully')
+  }
+  catch {
+    ElMessage.error('Failed to remove user')
   }
 }
 </script>
@@ -54,37 +59,82 @@ async function toggleStatus(user) {
   <div class="container">
     <ElCard class="box-card">
       <div class="card-header">
-        <h1>系统设置</h1>
+        <h1>用户权限管理</h1>
       </div>
+      <ElForm label-width="120px" @submit.prevent="addUserHandler">
+        <ElFormItem label="用户ID">
+          <ElInput v-model="newUser.user_id" placeholder="用户ID" required />
+        </ElFormItem>
+        <ElFormItem label="用户名">
+          <ElInput v-model="newUser.username" placeholder="用户名" required />
+        </ElFormItem>
+        <ElFormItem label="创建时间">
+          <ElInput v-model="newUser.created_at" placeholder="创建时间" required />
+        </ElFormItem>
+        <ElFormItem label="最后登录时间">
+          <ElInput v-model="newUser.last_login_time" placeholder="最后登录时间" required />
+        </ElFormItem>
+        <ElFormItem label="状态">
+          <ElInput v-model="newUser.status" placeholder="状态" required />
+        </ElFormItem>
+        <ElFormItem class="form-actions">
+          <ElButton type="primary" @click="addUserHandler">
+            添加用户
+          </ElButton>
+        </ElFormItem>
+      </ElForm>
       <div class="table-container">
-        <ElTable :data="systemSettings" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="id" label="用户ID" width="150" />
+        <ElTable :data="userInfo" style="width: auto; margin: 0 auto;" height="400" border>
+          <ElTableColumn prop="user_id" label="用户ID" width="150" />
           <ElTableColumn prop="username" label="用户名" width="150" />
           <ElTableColumn prop="created_at" label="创建时间" width="150" />
           <ElTableColumn prop="last_login_time" label="最后登录时间" width="150" />
           <ElTableColumn prop="status" label="状态" width="150" />
-          <ElTableColumn label="操作" width="300">
+          <ElTableColumn label="操作" width="150">
             <template #default="scope">
-              <ElButton type="primary" size="small" @click="viewDetails(scope.row)">
-                查看详情
-              </ElButton>
-              <ElButton type="primary" size="small" @click="editUser(scope.row)">
+              <ElButton type="primary" size="small" @click="editUserHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="deleteUser(scope.row.id)">
+              <ElButton type="danger" size="small" @click="removeUserHandler(scope.row.user_id)">
                 删除
-              </ElButton>
-              <ElButton type="warning" size="small" @click="resetPassword(scope.row)">
-                重置密码
-              </ElButton>
-              <ElButton type="info" size="small" @click="toggleStatus(scope.row)">
-                {{ scope.row.status === 'enabled' ? '禁用' : '启用' }}
               </ElButton>
             </template>
           </ElTableColumn>
         </ElTable>
       </div>
     </ElCard>
+    <div v-if="editingUser" class="edit-container">
+      <ElCard class="box-card">
+        <div class="card-header">
+          <h2>编辑用户</h2>
+        </div>
+        <ElForm label-width="120px" @submit.prevent="updateUserHandler">
+          <ElFormItem label="用户ID">
+            <ElInput v-model="editingUser.user_id" placeholder="用户ID" required />
+          </ElFormItem>
+          <ElFormItem label="用户名">
+            <ElInput v-model="editingUser.username" placeholder="用户名" required />
+          </ElFormItem>
+          <ElFormItem label="创建时间">
+            <ElInput v-model="editingUser.created_at" placeholder="创建时间" required />
+          </ElFormItem>
+          <ElFormItem label="最后登录时间">
+            <ElInput v-model="editingUser.last_login_time" placeholder="最后登录时间" required />
+          </ElFormItem>
+          <ElFormItem label="状态">
+            <ElInput v-model="editingUser.status" placeholder="状态" required />
+          </ElFormItem>
+          <ElFormItem class="form-actions">
+            <ElButton type="primary" @click="updateUserHandler">
+              更新用户
+            </ElButton>
+            <ElButton @click="editingUser = null">
+              取消
+            </ElButton>
+          </ElFormItem>
+        </ElForm>
+      </ElCard>
+    </div>
   </div>
 </template>
 
@@ -120,8 +170,17 @@ h1 {
   margin-bottom: 20px;
 }
 
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .table-container {
   display: flex;
   justify-content: center;
+}
+
+.edit-container {
+  margin-top: 20px;
 }
 </style>

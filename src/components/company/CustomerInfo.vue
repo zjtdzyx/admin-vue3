@@ -1,27 +1,23 @@
 <script setup lang="ts">
-import { useCustomerStore } from '@/store/customer'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const customerStore = useCustomerStore()
-const customerInfo = ref([])
+const customerInfo = ref([
+  { customer_number: 'C001', name: '张三', contact: '13800000001', address: '北京市' },
+  { customer_number: 'C002', name: '李四', contact: '13900000002', address: '上海市' },
+])
 const newCustomer = ref({ customer_number: '', name: '', contact: '', address: '' })
 const editingCustomer = ref<{ customer_number: string, name: string, contact: string, address: string } | null>(null)
 
-onMounted(async () => {
-  try {
-    await customerStore.loadCustomers()
-    customerInfo.value = customerStore.customers
-  }
-  catch {
-    ElMessage.error('Failed to fetch customer info')
-  }
+onMounted(() => {
+  // 模拟获取顾客信息
+  ElMessage.success('Customer info loaded successfully')
 })
 
-async function addCustomer() {
+function addCustomerHandler() {
   try {
-    await customerStore.addCustomer(newCustomer.value)
+    customerInfo.value.push({ ...newCustomer.value })
     newCustomer.value = { customer_number: '', name: '', contact: '', address: '' }
     ElMessage.success('Customer added successfully')
   }
@@ -30,13 +26,16 @@ async function addCustomer() {
   }
 }
 
-function editCustomer(customer) {
+function editCustomerHandler(customer) {
   editingCustomer.value = { ...customer }
 }
 
-async function updateCustomer() {
+function updateCustomerHandler() {
   try {
-    await customerStore.editCustomer(editingCustomer.value.customer_number, editingCustomer.value)
+    const index = customerInfo.value.findIndex(c => c.customer_number === editingCustomer.value.customer_number)
+    if (index !== -1) {
+      customerInfo.value[index] = { ...editingCustomer.value }
+    }
     editingCustomer.value = null
     ElMessage.success('Customer updated successfully')
   }
@@ -45,9 +44,9 @@ async function updateCustomer() {
   }
 }
 
-async function removeCustomer(customer_number) {
+function removeCustomerHandler(customer_number) {
   try {
-    await customerStore.removeCustomer(customer_number)
+    customerInfo.value = customerInfo.value.filter(c => c.customer_number !== customer_number)
     ElMessage.success('Customer removed successfully')
   }
   catch {
@@ -62,7 +61,7 @@ async function removeCustomer(customer_number) {
       <div class="card-header">
         <h1>顾客信息管理</h1>
       </div>
-      <ElForm label-width="120px" @submit.prevent="addCustomer">
+      <ElForm label-width="120px" @submit.prevent="addCustomerHandler">
         <ElFormItem label="客户编号">
           <ElInput v-model="newCustomer.customer_number" placeholder="客户编号" required />
         </ElFormItem>
@@ -76,7 +75,7 @@ async function removeCustomer(customer_number) {
           <ElInput v-model="newCustomer.address" placeholder="地址" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
-          <ElButton type="primary" @click="addCustomer">
+          <ElButton type="primary" @click="addCustomerHandler">
             添加客户
           </ElButton>
         </ElFormItem>
@@ -89,10 +88,10 @@ async function removeCustomer(customer_number) {
           <ElTableColumn prop="address" label="地址" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
-              <ElButton type="primary" size="small" @click="editCustomer(scope.row)">
+              <ElButton type="primary" size="small" @click="editCustomerHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeCustomer(scope.row.customer_number)">
+              <ElButton type="danger" size="small" @click="removeCustomerHandler(scope.row.customer_number)">
                 删除
               </ElButton>
             </template>
@@ -100,30 +99,34 @@ async function removeCustomer(customer_number) {
         </ElTable>
       </div>
     </ElCard>
-    <div v-if="editingCustomer">
-      <h2>编辑客户</h2>
-      <ElForm label-width="120px" @submit.prevent="updateCustomer">
-        <ElFormItem label="客户编号">
-          <ElInput v-model="editingCustomer.customer_number" placeholder="客户编号" required />
-        </ElFormItem>
-        <ElFormItem label="名称">
-          <ElInput v-model="editingCustomer.name" placeholder="名称" required />
-        </ElFormItem>
-        <ElFormItem label="联系人">
-          <ElInput v-model="editingCustomer.contact" placeholder="联系人" required />
-        </ElFormItem>
-        <ElFormItem label="地址">
-          <ElInput v-model="editingCustomer.address" placeholder="地址" required />
-        </ElFormItem>
-        <ElFormItem class="form-actions">
-          <ElButton type="primary" @click="updateCustomer">
-            更新客户
-          </ElButton>
-          <ElButton @click="editingCustomer = null">
-            取消
-          </ElButton>
-        </ElFormItem>
-      </ElForm>
+    <div v-if="editingCustomer" class="edit-container">
+      <ElCard class="box-card">
+        <div class="card-header">
+          <h2>编辑客户</h2>
+        </div>
+        <ElForm label-width="120px" @submit.prevent="updateCustomerHandler">
+          <ElFormItem label="客户编号">
+            <ElInput v-model="editingCustomer.customer_number" placeholder="客户编号" required />
+          </ElFormItem>
+          <ElFormItem label="名称">
+            <ElInput v-model="editingCustomer.name" placeholder="名称" required />
+          </ElFormItem>
+          <ElFormItem label="联系人">
+            <ElInput v-model="editingCustomer.contact" placeholder="联系人" required />
+          </ElFormItem>
+          <ElFormItem label="地址">
+            <ElInput v-model="editingCustomer.address" placeholder="地址" required />
+          </ElFormItem>
+          <ElFormItem class="form-actions">
+            <ElButton type="primary" @click="updateCustomerHandler">
+              更新客户
+            </ElButton>
+            <ElButton @click="editingCustomer = null">
+              取消
+            </ElButton>
+          </ElFormItem>
+        </ElForm>
+      </ElCard>
     </div>
   </div>
 </template>
@@ -168,5 +171,9 @@ h1 {
 .table-container {
   display: flex;
   justify-content: center;
+}
+
+.edit-container {
+  margin-top: 20px;
 }
 </style>

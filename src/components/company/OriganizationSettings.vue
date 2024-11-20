@@ -1,27 +1,23 @@
 <script setup lang="ts">
-import { useOrganizationStore } from '@/store/organization'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const organizationStore = useOrganizationStore()
-const organizationInfo = ref([])
+const organizationInfo = ref([
+  { organization_number: 'O001', organization_name: '研发部', type: '技术' },
+  { organization_number: 'O002', organization_name: '销售部', type: '市场' },
+])
 const newOrganization = ref({ organization_number: '', organization_name: '', type: '' })
 const editingOrganization = ref<{ organization_number: string, organization_name: string, type: string } | null>(null)
 
-onMounted(async () => {
-  try {
-    await organizationStore.loadOrganizations()
-    organizationInfo.value = organizationStore.organizations
-  }
-  catch {
-    ElMessage.error('Failed to fetch organization info')
-  }
+onMounted(() => {
+  // 模拟获取公司机构信息
+  ElMessage.success('Organization info loaded successfully')
 })
 
-async function addOrganization() {
+function addOrganizationHandler() {
   try {
-    await organizationStore.addOrganization(newOrganization.value)
+    organizationInfo.value.push({ ...newOrganization.value })
     newOrganization.value = { organization_number: '', organization_name: '', type: '' }
     ElMessage.success('Organization added successfully')
   }
@@ -30,13 +26,16 @@ async function addOrganization() {
   }
 }
 
-function editOrganization(organization) {
+function editOrganizationHandler(organization) {
   editingOrganization.value = { ...organization }
 }
 
-async function updateOrganization() {
+function updateOrganizationHandler() {
   try {
-    await organizationStore.editOrganization(editingOrganization.value.organization_number, editingOrganization.value)
+    const index = organizationInfo.value.findIndex(o => o.organization_number === editingOrganization.value.organization_number)
+    if (index !== -1) {
+      organizationInfo.value[index] = { ...editingOrganization.value }
+    }
     editingOrganization.value = null
     ElMessage.success('Organization updated successfully')
   }
@@ -45,9 +44,9 @@ async function updateOrganization() {
   }
 }
 
-async function removeOrganization(organization_number) {
+function removeOrganizationHandler(organization_number) {
   try {
-    await organizationStore.removeOrganization(organization_number)
+    organizationInfo.value = organizationInfo.value.filter(o => o.organization_number !== organization_number)
     ElMessage.success('Organization removed successfully')
   }
   catch {
@@ -62,7 +61,7 @@ async function removeOrganization(organization_number) {
       <div class="card-header">
         <h1>公司机构信息管理</h1>
       </div>
-      <ElForm label-width="120px" @submit.prevent="addOrganization">
+      <ElForm label-width="120px" @submit.prevent="addOrganizationHandler">
         <ElFormItem label="组织编号">
           <ElInput v-model="newOrganization.organization_number" placeholder="组织编号" required />
         </ElFormItem>
@@ -73,7 +72,7 @@ async function removeOrganization(organization_number) {
           <ElInput v-model="newOrganization.type" placeholder="类型" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
-          <ElButton type="primary" @click="addOrganization">
+          <ElButton type="primary" @click="addOrganizationHandler">
             添加组织
           </ElButton>
         </ElFormItem>
@@ -85,10 +84,10 @@ async function removeOrganization(organization_number) {
           <ElTableColumn prop="type" label="类型" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
-              <ElButton type="primary" size="small" @click="editOrganization(scope.row)">
+              <ElButton type="primary" size="small" @click="editOrganizationHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeOrganization(scope.row.organization_number)">
+              <ElButton type="danger" size="small" @click="removeOrganizationHandler(scope.row.organization_number)">
                 删除
               </ElButton>
             </template>
@@ -96,27 +95,31 @@ async function removeOrganization(organization_number) {
         </ElTable>
       </div>
     </ElCard>
-    <div v-if="editingOrganization">
-      <h2>编辑组织</h2>
-      <ElForm label-width="120px" @submit.prevent="updateOrganization">
-        <ElFormItem label="组织编号">
-          <ElInput v-model="editingOrganization.organization_number" placeholder="组织编号" required />
-        </ElFormItem>
-        <ElFormItem label="组织名称">
-          <ElInput v-model="editingOrganization.organization_name" placeholder="组织名称" required />
-        </ElFormItem>
-        <ElFormItem label="类型">
-          <ElInput v-model="editingOrganization.type" placeholder="类型" required />
-        </ElFormItem>
-        <ElFormItem class="form-actions">
-          <ElButton type="primary" @click="updateOrganization">
-            更新组织
-          </ElButton>
-          <ElButton @click="editingOrganization = null">
-            取消
-          </ElButton>
-        </ElFormItem>
-      </ElForm>
+    <div v-if="editingOrganization" class="edit-container">
+      <ElCard class="box-card">
+        <div class="card-header">
+          <h2>编辑组织</h2>
+        </div>
+        <ElForm label-width="120px" @submit.prevent="updateOrganizationHandler">
+          <ElFormItem label="组织编号">
+            <ElInput v-model="editingOrganization.organization_number" placeholder="组织编号" required />
+          </ElFormItem>
+          <ElFormItem label="组织名称">
+            <ElInput v-model="editingOrganization.organization_name" placeholder="组织名称" required />
+          </ElFormItem>
+          <ElFormItem label="类型">
+            <ElInput v-model="editingOrganization.type" placeholder="类型" required />
+          </ElFormItem>
+          <ElFormItem class="form-actions">
+            <ElButton type="primary" @click="updateOrganizationHandler">
+              更新组织
+            </ElButton>
+            <ElButton @click="editingOrganization = null">
+              取消
+            </ElButton>
+          </ElFormItem>
+        </ElForm>
+      </ElCard>
     </div>
   </div>
 </template>
@@ -161,5 +164,9 @@ h1 {
 .table-container {
   display: flex;
   justify-content: center;
+}
+
+.edit-container {
+  margin-top: 20px;
 }
 </style>

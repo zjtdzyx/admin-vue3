@@ -5,6 +5,11 @@ export async function createCustomer(customer) {
   return response.data
 }
 
+export async function getCustomers() {
+  const response = await api.get('/customers')
+  return response.data
+}
+
 export async function getCustomer(customerNumber) {
   const response = await api.get(`/customers/${customerNumber}`)
   return response.data
