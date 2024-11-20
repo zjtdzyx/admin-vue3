@@ -1,24 +1,35 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const customerInfo = ref([
-  { customer_number: 'C001', name: '张三', contact: '13800000001', address: '北京市' },
-  { customer_number: 'C002', name: '李四', contact: '13900000002', address: '上海市' },
-])
-const newCustomer = ref({ customer_number: '', name: '', contact: '', address: '' })
-const editingCustomer = ref<{ customer_number: string, name: string, contact: string, address: string } | null>(null)
+const customerInfo = ref([])
+const newCustomer = ref({ customerNumber: '', name: '', contact: '', address: '' })
+const editingCustomer = ref<{ customerNumber: string, name: string, contact: string, address: string } | null>(null)
 
-onMounted(() => {
-  // 模拟获取顾客信息
-  ElMessage.success('Customer info loaded successfully')
+const api = axios.create({
+  baseURL: import.meta.env.VITE_APP_API_BASEURL,
+  timeout: 1000 * 60,
+  responseType: 'json',
 })
 
-function addCustomerHandler() {
+onMounted(async () => {
   try {
-    customerInfo.value.push({ ...newCustomer.value })
-    newCustomer.value = { customer_number: '', name: '', contact: '', address: '' }
+    const response = await api.get('/customers')
+    customerInfo.value = response.data
+    ElMessage.success('Customer info loaded successfully')
+  }
+  catch {
+    ElMessage.error('Failed to load customer info')
+  }
+})
+
+async function addCustomerHandler() {
+  try {
+    const response = await api.post('/customers', newCustomer.value)
+    customerInfo.value.push(response.data)
+    newCustomer.value = { customerNumber: '', name: '', contact: '', address: '' }
     ElMessage.success('Customer added successfully')
   }
   catch {
@@ -30,11 +41,12 @@ function editCustomerHandler(customer) {
   editingCustomer.value = { ...customer }
 }
 
-function updateCustomerHandler() {
+async function updateCustomerHandler() {
   try {
-    const index = customerInfo.value.findIndex(c => c.customer_number === editingCustomer.value.customer_number)
+    const response = await api.put(`/customers/${editingCustomer.value.customerNumber}`, editingCustomer.value)
+    const index = customerInfo.value.findIndex(c => c.customerNumber === editingCustomer.value.customerNumber)
     if (index !== -1) {
-      customerInfo.value[index] = { ...editingCustomer.value }
+      customerInfo.value[index] = response.data
     }
     editingCustomer.value = null
     ElMessage.success('Customer updated successfully')
@@ -44,9 +56,10 @@ function updateCustomerHandler() {
   }
 }
 
-function removeCustomerHandler(customer_number) {
+async function removeCustomerHandler(customerNumber) {
   try {
-    customerInfo.value = customerInfo.value.filter(c => c.customer_number !== customer_number)
+    await api.delete(`/customers/${customerNumber}`)
+    customerInfo.value = customerInfo.value.filter(c => c.customerNumber !== customerNumber)
     ElMessage.success('Customer removed successfully')
   }
   catch {
@@ -63,7 +76,7 @@ function removeCustomerHandler(customer_number) {
       </div>
       <ElForm label-width="120px" @submit.prevent="addCustomerHandler">
         <ElFormItem label="客户编号">
-          <ElInput v-model="newCustomer.customer_number" placeholder="客户编号" required />
+          <ElInput v-model="newCustomer.customerNumber" placeholder="客户编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
           <ElInput v-model="newCustomer.name" placeholder="名称" required />
@@ -82,7 +95,7 @@ function removeCustomerHandler(customer_number) {
       </ElForm>
       <div class="table-container">
         <ElTable :data="customerInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="customer_number" label="客户编号" width="150" />
+          <ElTableColumn prop="customerNumber" label="客户编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
           <ElTableColumn prop="contact" label="联系人" width="150" />
           <ElTableColumn prop="address" label="地址" width="150" />
@@ -91,7 +104,7 @@ function removeCustomerHandler(customer_number) {
               <ElButton type="primary" size="small" @click="editCustomerHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeCustomerHandler(scope.row.customer_number)">
+              <ElButton type="danger" size="small" @click="removeCustomerHandler(scope.row.customerNumber)">
                 删除
               </ElButton>
             </template>
@@ -106,7 +119,7 @@ function removeCustomerHandler(customer_number) {
         </div>
         <ElForm label-width="120px" @submit.prevent="updateCustomerHandler">
           <ElFormItem label="客户编号">
-            <ElInput v-model="editingCustomer.customer_number" placeholder="客户编号" required />
+            <ElInput v-model="editingCustomer.customerNumber" placeholder="客户编号" required />
           </ElFormItem>
           <ElFormItem label="名称">
             <ElInput v-model="editingCustomer.name" placeholder="名称" required />

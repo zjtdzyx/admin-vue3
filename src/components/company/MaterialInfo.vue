@@ -1,24 +1,35 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const materialInfo = ref([
-  { material_number: 'M001', name: '钢材', unit: '吨', cost_price: '5000', selling_price: '6000', quantity: '100' },
-  { material_number: 'M002', name: '水泥', unit: '吨', cost_price: '300', selling_price: '400', quantity: '200' },
-])
-const newMaterial = ref({ material_number: '', name: '', unit: '', cost_price: '', selling_price: '', quantity: '' })
-const editingMaterial = ref<{ material_number: string, name: string, unit: string, cost_price: string, selling_price: string, quantity: string } | null>(null)
+const materialInfo = ref([])
+const newMaterial = ref({ materialNumber: '', name: '', unit: '', costPrice: '', sellingPrice: '' })
+const editingMaterial = ref<{ materialNumber: string, name: string, unit: string, costPrice: string, sellingPrice: string } | null>(null)
 
-onMounted(() => {
-  // 模拟获取物资信息
-  ElMessage.success('Material info loaded successfully')
+const api = axios.create({
+  baseURL: import.meta.env.VITE_APP_API_BASEURL,
+  timeout: 1000 * 60,
+  responseType: 'json',
 })
 
-function addMaterialHandler() {
+onMounted(async () => {
   try {
-    materialInfo.value.push({ ...newMaterial.value })
-    newMaterial.value = { material_number: '', name: '', unit: '', cost_price: '', selling_price: '', quantity: '' }
+    const response = await api.get('/materials')
+    materialInfo.value = response.data
+    ElMessage.success('Material info loaded successfully')
+  }
+  catch {
+    ElMessage.error('Failed to load material info')
+  }
+})
+
+async function addMaterialHandler() {
+  try {
+    const response = await api.post('/materials', newMaterial.value)
+    materialInfo.value.push(response.data)
+    newMaterial.value = { materialNumber: '', name: '', unit: '', costPrice: '', sellingPrice: '' }
     ElMessage.success('Material added successfully')
   }
   catch {
@@ -30,11 +41,12 @@ function editMaterialHandler(material) {
   editingMaterial.value = { ...material }
 }
 
-function updateMaterialHandler() {
+async function updateMaterialHandler() {
   try {
-    const index = materialInfo.value.findIndex(m => m.material_number === editingMaterial.value.material_number)
+    const response = await api.put(`/materials/${editingMaterial.value.materialNumber}`, editingMaterial.value)
+    const index = materialInfo.value.findIndex(m => m.materialNumber === editingMaterial.value.materialNumber)
     if (index !== -1) {
-      materialInfo.value[index] = { ...editingMaterial.value }
+      materialInfo.value[index] = response.data
     }
     editingMaterial.value = null
     ElMessage.success('Material updated successfully')
@@ -44,9 +56,10 @@ function updateMaterialHandler() {
   }
 }
 
-function removeMaterialHandler(material_number) {
+async function removeMaterialHandler(materialNumber) {
   try {
-    materialInfo.value = materialInfo.value.filter(m => m.material_number !== material_number)
+    await api.delete(`/materials/${materialNumber}`)
+    materialInfo.value = materialInfo.value.filter(m => m.materialNumber !== materialNumber)
     ElMessage.success('Material removed successfully')
   }
   catch {
@@ -63,7 +76,7 @@ function removeMaterialHandler(material_number) {
       </div>
       <ElForm label-width="120px" @submit.prevent="addMaterialHandler">
         <ElFormItem label="物资编号">
-          <ElInput v-model="newMaterial.material_number" placeholder="物资编号" required />
+          <ElInput v-model="newMaterial.materialNumber" placeholder="物资编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
           <ElInput v-model="newMaterial.name" placeholder="名称" required />
@@ -72,13 +85,10 @@ function removeMaterialHandler(material_number) {
           <ElInput v-model="newMaterial.unit" placeholder="单位" required />
         </ElFormItem>
         <ElFormItem label="成本价">
-          <ElInput v-model="newMaterial.cost_price" placeholder="成本价" required />
+          <ElInput v-model="newMaterial.costPrice" placeholder="成本价" required />
         </ElFormItem>
         <ElFormItem label="销售价">
-          <ElInput v-model="newMaterial.selling_price" placeholder="销售价" required />
-        </ElFormItem>
-        <ElFormItem label="数量">
-          <ElInput v-model="newMaterial.quantity" placeholder="数量" required />
+          <ElInput v-model="newMaterial.sellingPrice" placeholder="销售价" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
           <ElButton type="primary" @click="addMaterialHandler">
@@ -88,18 +98,17 @@ function removeMaterialHandler(material_number) {
       </ElForm>
       <div class="table-container">
         <ElTable :data="materialInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="material_number" label="物资编号" width="150" />
+          <ElTableColumn prop="materialNumber" label="物资编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
           <ElTableColumn prop="unit" label="单位" width="150" />
-          <ElTableColumn prop="cost_price" label="成本价" width="150" />
-          <ElTableColumn prop="selling_price" label="销售价" width="150" />
-          <ElTableColumn prop="quantity" label="数量" width="150" />
+          <ElTableColumn prop="costPrice" label="成本价" width="150" />
+          <ElTableColumn prop="sellingPrice" label="销售价" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
               <ElButton type="primary" size="small" @click="editMaterialHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeMaterialHandler(scope.row.material_number)">
+              <ElButton type="danger" size="small" @click="removeMaterialHandler(scope.row.materialNumber)">
                 删除
               </ElButton>
             </template>
@@ -114,7 +123,7 @@ function removeMaterialHandler(material_number) {
         </div>
         <ElForm label-width="120px" @submit.prevent="updateMaterialHandler">
           <ElFormItem label="物资编号">
-            <ElInput v-model="editingMaterial.material_number" placeholder="物资编号" required />
+            <ElInput v-model="editingMaterial.materialNumber" placeholder="物资编号" required />
           </ElFormItem>
           <ElFormItem label="名称">
             <ElInput v-model="editingMaterial.name" placeholder="名称" required />
@@ -123,13 +132,10 @@ function removeMaterialHandler(material_number) {
             <ElInput v-model="editingMaterial.unit" placeholder="单位" required />
           </ElFormItem>
           <ElFormItem label="成本价">
-            <ElInput v-model="editingMaterial.cost_price" placeholder="成本价" required />
+            <ElInput v-model="editingMaterial.costPrice" placeholder="成本价" required />
           </ElFormItem>
           <ElFormItem label="销售价">
-            <ElInput v-model="editingMaterial.selling_price" placeholder="销售价" required />
-          </ElFormItem>
-          <ElFormItem label="数量">
-            <ElInput v-model="editingMaterial.quantity" placeholder="数量" required />
+            <ElInput v-model="editingMaterial.sellingPrice" placeholder="销售价" required />
           </ElFormItem>
           <ElFormItem class="form-actions">
             <ElButton type="primary" @click="updateMaterialHandler">

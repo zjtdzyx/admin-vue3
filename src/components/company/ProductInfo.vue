@@ -1,24 +1,35 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const productInfo = ref([
-  { product_number: 'P001', product_name: '产品A', type: '类型1' },
-  { product_number: 'P002', product_name: '产品B', type: '类型2' },
-])
-const newProduct = ref({ product_number: '', product_name: '', type: '' })
-const editingProduct = ref<{ product_number: string, product_name: string, type: string } | null>(null)
+const productInfo = ref([])
+const newProduct = ref({ productNumber: '', name: '', grade: '', origin: '', costPrice: '', packaging: '' })
+const editingProduct = ref<{ productNumber: string, name: string, grade: string, origin: string, costPrice: string, packaging: string } | null>(null)
 
-onMounted(() => {
-  // 模拟获取产品信息
-  ElMessage.success('Product info loaded successfully')
+const api = axios.create({
+  baseURL: import.meta.env.VITE_APP_API_BASEURL,
+  timeout: 1000 * 60,
+  responseType: 'json',
 })
 
-function addProductHandler() {
+onMounted(async () => {
   try {
-    productInfo.value.push({ ...newProduct.value })
-    newProduct.value = { product_number: '', product_name: '', type: '' }
+    const response = await api.get('/products')
+    productInfo.value = response.data
+    ElMessage.success('Product info loaded successfully')
+  }
+  catch {
+    ElMessage.error('Failed to load product info')
+  }
+})
+
+async function addProductHandler() {
+  try {
+    const response = await api.post('/products', newProduct.value)
+    productInfo.value.push(response.data)
+    newProduct.value = { productNumber: '', name: '', grade: '', origin: '', costPrice: '', packaging: '' }
     ElMessage.success('Product added successfully')
   }
   catch {
@@ -30,11 +41,12 @@ function editProductHandler(product) {
   editingProduct.value = { ...product }
 }
 
-function updateProductHandler() {
+async function updateProductHandler() {
   try {
-    const index = productInfo.value.findIndex(p => p.product_number === editingProduct.value.product_number)
+    const response = await api.put(`/products/${editingProduct.value.productNumber}`, editingProduct.value)
+    const index = productInfo.value.findIndex(p => p.productNumber === editingProduct.value.productNumber)
     if (index !== -1) {
-      productInfo.value[index] = { ...editingProduct.value }
+      productInfo.value[index] = response.data
     }
     editingProduct.value = null
     ElMessage.success('Product updated successfully')
@@ -44,9 +56,10 @@ function updateProductHandler() {
   }
 }
 
-function removeProductHandler(product_number) {
+async function removeProductHandler(productNumber) {
   try {
-    productInfo.value = productInfo.value.filter(p => p.product_number !== product_number)
+    await api.delete(`/products/${productNumber}`)
+    productInfo.value = productInfo.value.filter(p => p.productNumber !== productNumber)
     ElMessage.success('Product removed successfully')
   }
   catch {
@@ -63,13 +76,22 @@ function removeProductHandler(product_number) {
       </div>
       <ElForm label-width="120px" @submit.prevent="addProductHandler">
         <ElFormItem label="产品编号">
-          <ElInput v-model="newProduct.product_number" placeholder="产品编号" required />
+          <ElInput v-model="newProduct.productNumber" placeholder="产品编号" required />
         </ElFormItem>
-        <ElFormItem label="产品名称">
-          <ElInput v-model="newProduct.product_name" placeholder="产品名称" required />
+        <ElFormItem label="名称">
+          <ElInput v-model="newProduct.name" placeholder="名称" required />
         </ElFormItem>
-        <ElFormItem label="类型">
-          <ElInput v-model="newProduct.type" placeholder="类型" required />
+        <ElFormItem label="等级">
+          <ElInput v-model="newProduct.grade" placeholder="等级" required />
+        </ElFormItem>
+        <ElFormItem label="产地">
+          <ElInput v-model="newProduct.origin" placeholder="产地" required />
+        </ElFormItem>
+        <ElFormItem label="成本价">
+          <ElInput v-model="newProduct.costPrice" placeholder="成本价" required />
+        </ElFormItem>
+        <ElFormItem label="包装">
+          <ElInput v-model="newProduct.packaging" placeholder="包装" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
           <ElButton type="primary" @click="addProductHandler">
@@ -79,15 +101,18 @@ function removeProductHandler(product_number) {
       </ElForm>
       <div class="table-container">
         <ElTable :data="productInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="product_number" label="产品编号" width="150" />
-          <ElTableColumn prop="product_name" label="产品名称" width="150" />
-          <ElTableColumn prop="type" label="类型" width="150" />
+          <ElTableColumn prop="productNumber" label="产品编号" width="150" />
+          <ElTableColumn prop="name" label="名称" width="150" />
+          <ElTableColumn prop="grade" label="等级" width="150" />
+          <ElTableColumn prop="origin" label="产地" width="150" />
+          <ElTableColumn prop="costPrice" label="成本价" width="150" />
+          <ElTableColumn prop="packaging" label="包装" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
               <ElButton type="primary" size="small" @click="editProductHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeProductHandler(scope.row.product_number)">
+              <ElButton type="danger" size="small" @click="removeProductHandler(scope.row.productNumber)">
                 删除
               </ElButton>
             </template>
@@ -102,13 +127,22 @@ function removeProductHandler(product_number) {
         </div>
         <ElForm label-width="120px" @submit.prevent="updateProductHandler">
           <ElFormItem label="产品编号">
-            <ElInput v-model="editingProduct.product_number" placeholder="产品编号" required />
+            <ElInput v-model="editingProduct.productNumber" placeholder="产品编号" required />
           </ElFormItem>
-          <ElFormItem label="产品名称">
-            <ElInput v-model="editingProduct.product_name" placeholder="产品名称" required />
+          <ElFormItem label="名称">
+            <ElInput v-model="editingProduct.name" placeholder="名称" required />
           </ElFormItem>
-          <ElFormItem label="类型">
-            <ElInput v-model="editingProduct.type" placeholder="类型" required />
+          <ElFormItem label="等级">
+            <ElInput v-model="editingProduct.grade" placeholder="等级" required />
+          </ElFormItem>
+          <ElFormItem label="产地">
+            <ElInput v-model="editingProduct.origin" placeholder="产地" required />
+          </ElFormItem>
+          <ElFormItem label="成本价">
+            <ElInput v-model="editingProduct.costPrice" placeholder="成本价" required />
+          </ElFormItem>
+          <ElFormItem label="包装">
+            <ElInput v-model="editingProduct.packaging" placeholder="包装" required />
           </ElFormItem>
           <ElFormItem class="form-actions">
             <ElButton type="primary" @click="updateProductHandler">

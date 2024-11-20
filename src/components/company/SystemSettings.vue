@@ -6,12 +6,14 @@ import 'element-plus/dist/index.css'
 const userInfo = ref([
   { user_id: 'U001', username: 'admin', created_at: '2023-01-01', last_login_time: '2023-01-10', status: '启用' },
   { user_id: 'U002', username: 'user', created_at: '2023-02-01', last_login_time: '2023-02-10', status: '禁用' },
+  { user_id: 'U003', username: 'guest', created_at: '2023-03-01', last_login_time: '2023-03-10', status: '启用' },
+  { user_id: 'U004', username: 'manager', created_at: '2023-04-01', last_login_time: '2023-04-10', status: '禁用' },
+  { user_id: 'U005', username: 'developer', created_at: '2023-05-01', last_login_time: '2023-05-10', status: '启用' },
 ])
 const newUser = ref({ user_id: '', username: '', created_at: '', last_login_time: '', status: '' })
 const editingUser = ref<{ user_id: string, username: string, created_at: string, last_login_time: string, status: string } | null>(null)
 
 onMounted(() => {
-  // 模拟获取用户信息
   ElMessage.success('User info loaded successfully')
 })
 
@@ -89,7 +91,13 @@ function removeUserHandler(user_id) {
           <ElTableColumn prop="username" label="用户名" width="150" />
           <ElTableColumn prop="created_at" label="创建时间" width="150" />
           <ElTableColumn prop="last_login_time" label="最后登录时间" width="150" />
-          <ElTableColumn prop="status" label="状态" width="150" />
+          <ElTableColumn prop="status" label="状态" width="150">
+            <template #default="scope">
+              <span :style="{ color: scope.row.status === '启用' ? 'green' : 'red', fontWeight: 'bold', fontSize: '16px' }">
+                {{ scope.row.status }}
+              </span>
+            </template>
+          </ElTableColumn>
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
               <ElButton type="primary" size="small" @click="editUserHandler(scope.row)">

@@ -1,24 +1,35 @@
 <script setup lang="ts">
+import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
 import { onMounted, ref } from 'vue'
 import 'element-plus/dist/index.css'
 
-const organizationInfo = ref([
-  { organization_number: 'O001', organization_name: '研发部', type: '技术' },
-  { organization_number: 'O002', organization_name: '销售部', type: '市场' },
-])
-const newOrganization = ref({ organization_number: '', organization_name: '', type: '' })
-const editingOrganization = ref<{ organization_number: string, organization_name: string, type: string } | null>(null)
+const organizationInfo = ref([])
+const newOrganization = ref({ organizationName: '', type: '' })
+const editingOrganization = ref<{ organizationName: string, type: string } | null>(null)
 
-onMounted(() => {
-  // 模拟获取公司机构信息
-  ElMessage.success('Organization info loaded successfully')
+const api = axios.create({
+  baseURL: import.meta.env.VITE_APP_API_BASEURL,
+  timeout: 1000 * 60,
+  responseType: 'json',
 })
 
-function addOrganizationHandler() {
+onMounted(async () => {
   try {
-    organizationInfo.value.push({ ...newOrganization.value })
-    newOrganization.value = { organization_number: '', organization_name: '', type: '' }
+    const response = await api.get('/organizations')
+    organizationInfo.value = response.data
+    ElMessage.success('Organization info loaded successfully')
+  }
+  catch {
+    ElMessage.error('Failed to load organization info')
+  }
+})
+
+async function addOrganizationHandler() {
+  try {
+    const response = await api.post('/organizations', newOrganization.value)
+    organizationInfo.value.push(response.data)
+    newOrganization.value = { organizationName: '', type: '' }
     ElMessage.success('Organization added successfully')
   }
   catch {
@@ -30,11 +41,12 @@ function editOrganizationHandler(organization) {
   editingOrganization.value = { ...organization }
 }
 
-function updateOrganizationHandler() {
+async function updateOrganizationHandler() {
   try {
-    const index = organizationInfo.value.findIndex(o => o.organization_number === editingOrganization.value.organization_number)
+    const response = await api.put(`/organizations/${editingOrganization.value.organizationName}`, editingOrganization.value)
+    const index = organizationInfo.value.findIndex(o => o.organizationName === editingOrganization.value.organizationName)
     if (index !== -1) {
-      organizationInfo.value[index] = { ...editingOrganization.value }
+      organizationInfo.value[index] = response.data
     }
     editingOrganization.value = null
     ElMessage.success('Organization updated successfully')
@@ -44,9 +56,10 @@ function updateOrganizationHandler() {
   }
 }
 
-function removeOrganizationHandler(organization_number) {
+async function removeOrganizationHandler(organizationName) {
   try {
-    organizationInfo.value = organizationInfo.value.filter(o => o.organization_number !== organization_number)
+    await api.delete(`/organizations/${organizationName}`)
+    organizationInfo.value = organizationInfo.value.filter(o => o.organizationName !== organizationName)
     ElMessage.success('Organization removed successfully')
   }
   catch {
@@ -62,32 +75,28 @@ function removeOrganizationHandler(organization_number) {
         <h1>公司机构信息管理</h1>
       </div>
       <ElForm label-width="120px" @submit.prevent="addOrganizationHandler">
-        <ElFormItem label="组织编号">
-          <ElInput v-model="newOrganization.organization_number" placeholder="组织编号" required />
-        </ElFormItem>
-        <ElFormItem label="组织名称">
-          <ElInput v-model="newOrganization.organization_name" placeholder="组织名称" required />
+        <ElFormItem label="机构名称">
+          <ElInput v-model="newOrganization.organizationName" placeholder="机构名称" required />
         </ElFormItem>
         <ElFormItem label="类型">
           <ElInput v-model="newOrganization.type" placeholder="类型" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
           <ElButton type="primary" @click="addOrganizationHandler">
-            添加组织
+            添加机构
           </ElButton>
         </ElFormItem>
       </ElForm>
       <div class="table-container">
         <ElTable :data="organizationInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="organization_number" label="组织编号" width="150" />
-          <ElTableColumn prop="organization_name" label="组织名称" width="150" />
+          <ElTableColumn prop="organizationName" label="机构名称" width="150" />
           <ElTableColumn prop="type" label="类型" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
               <ElButton type="primary" size="small" @click="editOrganizationHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeOrganizationHandler(scope.row.organization_number)">
+              <ElButton type="danger" size="small" @click="removeOrganizationHandler(scope.row.organizationName)">
                 删除
               </ElButton>
             </template>
@@ -98,21 +107,18 @@ function removeOrganizationHandler(organization_number) {
     <div v-if="editingOrganization" class="edit-container">
       <ElCard class="box-card">
         <div class="card-header">
-          <h2>编辑组织</h2>
+          <h2>编辑机构</h2>
         </div>
         <ElForm label-width="120px" @submit.prevent="updateOrganizationHandler">
-          <ElFormItem label="组织编号">
-            <ElInput v-model="editingOrganization.organization_number" placeholder="组织编号" required />
-          </ElFormItem>
-          <ElFormItem label="组织名称">
-            <ElInput v-model="editingOrganization.organization_name" placeholder="组织名称" required />
+          <ElFormItem label="机构名称">
+            <ElInput v-model="editingOrganization.organizationName" placeholder="机构名称" required />
           </ElFormItem>
           <ElFormItem label="类型">
             <ElInput v-model="editingOrganization.type" placeholder="类型" required />
           </ElFormItem>
           <ElFormItem class="form-actions">
             <ElButton type="primary" @click="updateOrganizationHandler">
-              更新组织
+              更新机构
             </ElButton>
             <ElButton @click="editingOrganization = null">
               取消
