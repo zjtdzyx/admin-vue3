@@ -1,70 +1,77 @@
 <script setup lang="ts">
-import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import 'element-plus/dist/index.css'
 
-const customerInfo = ref([])
+const defaultCustomerInfo = [
+  { customerNumber: '001', name: '张三', contact: '123456789', address: '北京市' },
+  { customerNumber: '002', name: '李四', contact: '987654321', address: '上海市' },
+  { customerNumber: '003', name: '王五', contact: '456123789', address: '广州市' },
+  { customerNumber: '004', name: '赵六', contact: '321654987', address: '深圳市' },
+  { customerNumber: '005', name: '孙七', contact: '789123456', address: '杭州市' },
+  { customerNumber: '006', name: '周八', contact: '654789123', address: '成都市' },
+  { customerNumber: '007', name: '吴九', contact: '123789456', address: '南京市' },
+  { customerNumber: '008', name: '郑十', contact: '987321654', address: '苏州市' },
+  { customerNumber: '009', name: '王十一', contact: '456987123', address: '武汉市' },
+  { customerNumber: '010', name: '李十二', contact: '321987654', address: '长沙市' }
+]
+
+const customerInfo = ref<any[]>(JSON.parse(localStorage.getItem('customerInfo') || JSON.stringify(defaultCustomerInfo)))
+
+const searchQuery = ref('')
+
+const filteredCustomerInfo = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  if (!query) return customerInfo.value
+  return customerInfo.value.filter(customer =>
+    Object.values(customer).some(value =>
+      String(value).toLowerCase().includes(query)
+    )
+  )
+})
+
 const newCustomer = ref({ customerNumber: '', name: '', contact: '', address: '' })
 const editingCustomer = ref<{ customerNumber: string, name: string, contact: string, address: string } | null>(null)
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_BASEURL,
-  timeout: 1000 * 60,
-  responseType: 'json',
+onMounted(() => {
+  ElMessage.success('Customer info loaded successfully')
 })
 
-onMounted(async () => {
-  try {
-    const response = await api.get('/customers')
-    customerInfo.value = response.data
-    ElMessage.success('Customer info loaded successfully')
-  }
-  catch {
-    ElMessage.error('Failed to load customer info')
-  }
-})
-
-async function addCustomerHandler() {
-  try {
-    const response = await api.post('/customers', newCustomer.value)
-    customerInfo.value.push(response.data)
-    newCustomer.value = { customerNumber: '', name: '', contact: '', address: '' }
-    ElMessage.success('Customer added successfully')
-  }
-  catch {
-    ElMessage.error('Failed to add customer')
-  }
+function saveToLocalStorage() {
+  localStorage.setItem('customerInfo', JSON.stringify(customerInfo.value))
 }
 
-function editCustomerHandler(customer) {
+function addCustomerHandler() {
+  customerInfo.value.push({ ...newCustomer.value })
+  newCustomer.value = { customerNumber: '', name: '', contact: '', address: '' }
+  saveToLocalStorage()
+  ElMessage.success('Customer added successfully')
+}
+
+function editCustomerHandler(customer: any) {
   editingCustomer.value = { ...customer }
 }
 
-async function updateCustomerHandler() {
-  try {
-    const response = await api.put(`/customers/${editingCustomer.value.customerNumber}`, editingCustomer.value)
-    const index = customerInfo.value.findIndex(c => c.customerNumber === editingCustomer.value.customerNumber)
-    if (index !== -1) {
-      customerInfo.value[index] = response.data
-    }
+function updateCustomerHandler() {
+  const index = customerInfo.value.findIndex(c => c.customerNumber === editingCustomer.value?.customerNumber)
+  if (index !== -1 && editingCustomer.value) {
+    customerInfo.value[index] = { ...editingCustomer.value }
     editingCustomer.value = null
+    saveToLocalStorage()
     ElMessage.success('Customer updated successfully')
-  }
-  catch {
-    ElMessage.error('Failed to update customer')
   }
 }
 
-async function removeCustomerHandler(customerNumber) {
-  try {
-    await api.delete(`/customers/${customerNumber}`)
-    customerInfo.value = customerInfo.value.filter(c => c.customerNumber !== customerNumber)
-    ElMessage.success('Customer removed successfully')
-  }
-  catch {
-    ElMessage.error('Failed to remove customer')
-  }
+function removeCustomerHandler(customerNumber: string) {
+  customerInfo.value = customerInfo.value.filter(c => c.customerNumber !== customerNumber)
+  saveToLocalStorage()
+  ElMessage.success('Customer removed successfully')
+}
+
+function restoreDefaultData() {
+  customerInfo.value = [...defaultCustomerInfo]
+  saveToLocalStorage()
+  ElMessage.success('Data restored to default values')
 }
 </script>
 
@@ -74,6 +81,15 @@ async function removeCustomerHandler(customerNumber) {
       <div class="card-header">
         <h1>顾客信息管理</h1>
       </div>
+      <!-- 搜索框 -->
+      <div class="search-container">
+        <ElInput
+          v-model="searchQuery"
+          placeholder="输入关键词搜索客户..."
+          clearable
+        />
+      </div>
+      
       <ElForm label-width="120px" @submit.prevent="addCustomerHandler">
         <ElFormItem label="客户编号">
           <ElInput v-model="newCustomer.customerNumber" placeholder="客户编号" required />
@@ -93,8 +109,9 @@ async function removeCustomerHandler(customerNumber) {
           </ElButton>
         </ElFormItem>
       </ElForm>
+
       <div class="table-container">
-        <ElTable :data="customerInfo" style="width: auto; margin: 0 auto;" height="400" border>
+        <ElTable :data="filteredCustomerInfo" style="width: auto; margin: 0 auto;" height="400" border>
           <ElTableColumn prop="customerNumber" label="客户编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
           <ElTableColumn prop="contact" label="联系人" width="150" />
@@ -111,6 +128,8 @@ async function removeCustomerHandler(customerNumber) {
           </ElTableColumn>
         </ElTable>
       </div>
+      
+      <ElButton type="warning" @click="restoreDefaultData">还原数据</ElButton>
     </ElCard>
     <div v-if="editingCustomer" class="edit-container">
       <ElCard class="box-card">
@@ -154,14 +173,18 @@ h1 {
   text-align: center;
 }
 
+.search-container {
+  margin-bottom: 20px;
+}
+
 .el-table th,
- .el-table td {
+.el-table td {
   padding: 8px !important;
   border-right: 1px solid #ebeef5;
 }
 
 .el-table th:last-child,
- .el-table td:last-child {
+.el-table td:last-child {
   border-right: none;
 }
 

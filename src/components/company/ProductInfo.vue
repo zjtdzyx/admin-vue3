@@ -1,70 +1,78 @@
 <script setup lang="ts">
-import axios from 'axios'
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import 'element-plus/dist/index.css'
 
-const productInfo = ref([])
+// 初始产品数据
+const initialProductInfo = [
+  { productNumber: 'P001', name: '苹果', grade: 'A', origin: '山东', costPrice: '5元/斤', packaging: '纸箱' },
+  { productNumber: 'P002', name: '香蕉', grade: 'B', origin: '海南', costPrice: '3元/斤', packaging: '塑料袋' },
+  { productNumber: 'P003', name: '橙子', grade: 'A', origin: '江西', costPrice: '4元/斤', packaging: '纸箱' },
+  { productNumber: 'P004', name: '葡萄', grade: 'A', origin: '新疆', costPrice: '6元/斤', packaging: '纸箱' },
+  { productNumber: 'P005', name: '西瓜', grade: 'B', origin: '河南', costPrice: '2元/斤', packaging: '塑料袋' },
+  { productNumber: 'P006', name: '草莓', grade: 'A', origin: '江苏', costPrice: '10元/斤', packaging: '纸箱' },
+  { productNumber: 'P007', name: '梨', grade: 'B', origin: '河北', costPrice: '3元/斤', packaging: '塑料袋' },
+  { productNumber: 'P008', name: '桃子', grade: 'A', origin: '陕西', costPrice: '5元/斤', packaging: '纸箱' }
+]
+
+// 从 localStorage 恢复产品数据
+const storedProductInfo = localStorage.getItem('productInfo')
+const productInfo = ref(storedProductInfo ? JSON.parse(storedProductInfo) : [...initialProductInfo])
+
+const searchQuery = ref('')
+const filteredProductInfo = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  if (!query) return productInfo.value
+  return productInfo.value.filter(product =>
+    Object.values(product).some(value =>
+      String(value).toLowerCase().includes(query)
+    )
+  )
+})
+
 const newProduct = ref({ productNumber: '', name: '', grade: '', origin: '', costPrice: '', packaging: '' })
 const editingProduct = ref<{ productNumber: string, name: string, grade: string, origin: string, costPrice: string, packaging: string } | null>(null)
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_BASEURL,
-  timeout: 1000 * 60,
-  responseType: 'json',
+onMounted(() => {
+  ElMessage.success('Product info loaded successfully')
 })
 
-onMounted(async () => {
-  try {
-    const response = await api.get('/products')
-    productInfo.value = response.data
-    ElMessage.success('Product info loaded successfully')
-  }
-  catch {
-    ElMessage.error('Failed to load product info')
-  }
-})
+// 保存数据到 localStorage
+function updateLocalStorage() {
+  localStorage.setItem('productInfo', JSON.stringify(productInfo.value))
+}
 
-async function addProductHandler() {
-  try {
-    const response = await api.post('/products', newProduct.value)
-    productInfo.value.push(response.data)
-    newProduct.value = { productNumber: '', name: '', grade: '', origin: '', costPrice: '', packaging: '' }
-    ElMessage.success('Product added successfully')
-  }
-  catch {
-    ElMessage.error('Failed to add product')
-  }
+function addProductHandler() {
+  productInfo.value.push({ ...newProduct.value })
+  updateLocalStorage()  // 更新 localStorage
+  newProduct.value = { productNumber: '', name: '', grade: '', origin: '', costPrice: '', packaging: '' }
+  ElMessage.success('Product added successfully')
 }
 
 function editProductHandler(product) {
   editingProduct.value = { ...product }
 }
 
-async function updateProductHandler() {
-  try {
-    const response = await api.put(`/products/${editingProduct.value.productNumber}`, editingProduct.value)
-    const index = productInfo.value.findIndex(p => p.productNumber === editingProduct.value.productNumber)
-    if (index !== -1) {
-      productInfo.value[index] = response.data
-    }
+function updateProductHandler() {
+  const index = productInfo.value.findIndex(p => p.productNumber === editingProduct.value?.productNumber)
+  if (index !== -1 && editingProduct.value) {
+    productInfo.value[index] = { ...editingProduct.value }
+    updateLocalStorage()  // 更新 localStorage
     editingProduct.value = null
     ElMessage.success('Product updated successfully')
   }
-  catch {
-    ElMessage.error('Failed to update product')
-  }
 }
 
-async function removeProductHandler(productNumber) {
-  try {
-    await api.delete(`/products/${productNumber}`)
-    productInfo.value = productInfo.value.filter(p => p.productNumber !== productNumber)
-    ElMessage.success('Product removed successfully')
-  }
-  catch {
-    ElMessage.error('Failed to remove product')
-  }
+function removeProductHandler(productNumber) {
+  productInfo.value = productInfo.value.filter(p => p.productNumber !== productNumber)
+  updateLocalStorage()  // 更新 localStorage
+  ElMessage.success('Product removed successfully')
+}
+
+function restoreDataHandler() {
+  productInfo.value = [...initialProductInfo]  // 还原到初始数据
+  updateLocalStorage()  // 更新 localStorage
+  ElMessage.success('Data restored to initial state')
 }
 </script>
 
@@ -73,6 +81,14 @@ async function removeProductHandler(productNumber) {
     <ElCard class="box-card">
       <div class="card-header">
         <h1>产品信息管理</h1>
+      </div>
+      <!-- 搜索框 -->
+      <div class="search-container">
+        <ElInput
+          v-model="searchQuery"
+          placeholder="输入关键词搜索产品..."
+          clearable
+        />
       </div>
       <ElForm label-width="120px" @submit.prevent="addProductHandler">
         <ElFormItem label="产品编号">
@@ -100,7 +116,7 @@ async function removeProductHandler(productNumber) {
         </ElFormItem>
       </ElForm>
       <div class="table-container">
-        <ElTable :data="productInfo" style="width: auto; margin: 0 auto;" height="400" border>
+        <ElTable :data="filteredProductInfo" style="width: auto; margin: 0 auto;" height="400" border>
           <ElTableColumn prop="productNumber" label="产品编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
           <ElTableColumn prop="grade" label="等级" width="150" />
@@ -118,6 +134,12 @@ async function removeProductHandler(productNumber) {
             </template>
           </ElTableColumn>
         </ElTable>
+      </div>
+      <!-- 还原按钮 -->
+      <div class="restore-container">
+        <ElButton type="warning" @click="restoreDataHandler">
+          还原数据
+        </ElButton>
       </div>
     </ElCard>
     <div v-if="editingProduct" class="edit-container">
@@ -158,6 +180,8 @@ async function removeProductHandler(productNumber) {
   </div>
 </template>
 
+
+
 <style scoped>
 .container {
   padding: 20px;
@@ -168,14 +192,18 @@ h1 {
   text-align: center;
 }
 
+.search-container {
+  margin-bottom: 20px;
+}
+
 .el-table th,
- .el-table td {
+.el-table td {
   padding: 8px !important;
   border-right: 1px solid #ebeef5;
 }
 
 .el-table th:last-child,
- .el-table td:last-child {
+.el-table td:last-child {
   border-right: none;
 }
 

@@ -358,6 +358,29 @@ const routes: RouteRecordRaw = {
         },
       ],
     },
+    // 统计分析
+    {
+      path: 'StatisticsAnalysis.vue',
+      name: 'multilevelMenuExampleStatisticsAnalysis.vue',
+      component: () =>
+        import('@/views/multilevel_menu_example/StatisticsAnalysis.vue'),
+      meta: {
+        title: '统计分析',
+      },
+      children: [
+        {
+          path: 'StatisticsAnalysis',
+          name: 'StatisticsAnalysisInfo',
+          component: () =>
+            import(
+              '@/views/multilevel_menu_example/StatisticsAnalysis/StatisticsAnalysis.vue'
+            ),
+          meta: {
+            title: '统计分析',
+          },
+        },
+      ],
+    },
   ],
 }
 
