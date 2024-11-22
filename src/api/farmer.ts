@@ -5,6 +5,12 @@ export async function createFarmer(farmer) {
   return response.data
 }
 
+// 获取所有农户信息
+export async function getFarmers() {
+  const response = await api.get('/farmers')
+  return response.data
+}
+
 export async function getFarmer(farmerNumber) {
   const response = await api.get(`/farmers/${farmerNumber}`)
   return response.data

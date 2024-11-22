@@ -3,6 +3,22 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { defineOptions, onBeforeUnmount, onMounted, ref } from 'vue'
 
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
+
 defineOptions({
   name: 'CustomerInfo',
 })
@@ -57,7 +73,7 @@ onBeforeUnmount(() => {
 // 获取数据的函数
 async function fetchTableData() {
   try {
-    const response = await axios.get('/api/customers') // 修改为实际接口地址
+    const response = await api.get('/customers') // 修改为实际接口地址
     tableData.value = response.data
   }
   catch (error) {
@@ -70,11 +86,11 @@ async function onSubmit() {
   try {
     if (form.value.id) {
       // 编辑客户
-      await axios.put(`/api/customers/${form.value.id}`, form.value)
+      await api.put(`/customers/${form.value.id}`, form.value)
     }
     else {
       // 添加客户
-      await axios.post('/api/customers', form.value)
+      await api.post('/customers', form.value)
     }
     fetchTableData() // 刷新表格数据
     dialogVisible.value = false // 关闭弹窗
@@ -93,7 +109,7 @@ function onEditCustomer(customer: User) {
 // 删除客户
 async function onDeleteCustomer(id: number) {
   try {
-    await axios.delete(`/api/customers/${id}`)
+    await api.delete(`/customers/${id}`)
     fetchTableData() // 刷新表格数据
   }
   catch (error) {
@@ -117,7 +133,7 @@ async function fetchCustomerInfo() {
 
   try {
     // 调用接口获取客户信息
-    const response = await axios.get('/api/customers', {
+    const response = await api.get('/customers', {
       params: { name: inputName.value },
     })
 

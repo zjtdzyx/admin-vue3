@@ -3,6 +3,22 @@ import axios from 'axios'
 import { ElMessageBox } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
 
+
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 // 定义接口
 interface productIN {
   productNumber: string
@@ -35,7 +51,7 @@ async function fetchTableData() {
   error.value = null
 
   try {
-    const response = await axios.get<productIN[]>('/products')
+    const response = await api.get<productIN[]>('/products')
     GetData.value = response.data
   }
   catch (err: any) {
@@ -63,7 +79,7 @@ async function onSubmit() {
 
   try {
     loading.value = true
-    const response = await axios.post('/products', form)
+    const response = await api.post('/products', form)
     responsedata.value = response.data
 
     ElMessageBox.alert('产品信息已成功提交！', '成功', {

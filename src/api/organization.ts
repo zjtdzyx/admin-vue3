@@ -5,6 +5,12 @@ export async function createOrganization(organization) {
   return response.data
 }
 
+// 获取所有公司机构信息
+export async function getOrganizations() {
+  const response = await api.get('/organizations')
+  return response.data
+}
+
 export async function getOrganization(organizationName) {
   const response = await api.get(`/organizations/${organizationName}`)
   return response.data

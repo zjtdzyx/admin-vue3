@@ -3,6 +3,21 @@ import axios from 'axios'
 import { ElMessageBox } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
 
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 // 产品出库的接口类型定义
 interface ProductOut {
   productNumber: string
@@ -35,7 +50,7 @@ async function fetchTableData() {
   error.value = null
 
   try {
-    const response = await axios.get<ProductOut[]>('/products')
+    const response = await api.get<ProductOut[]>('/products')
     GetData.value = response.data // 将返回的数据赋值给表格数据
   }
   catch (err: any) {
@@ -89,7 +104,7 @@ async function onSubmit() {
 
   try {
     // 更新产品出库数量
-    const _response = await axios.put(`/products/out/${selectedProduct.productNumber}`, {
+    const _response = await api.put(`/products/out/${selectedProduct.productNumber}`, {
       ...selectedProduct,
       quantity: form.quantity,
     })

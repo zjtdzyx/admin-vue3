@@ -113,39 +113,6 @@ const routes: RouteRecordRaw = {
           },
         },
         {
-          path: 'product_in',
-          name: 'wholesaleCenterProductIn',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/wholesale_center/product_in.vue'
-            ),
-          meta: {
-            title: '产品入库',
-          },
-        },
-        {
-          path: 'sales_management',
-          name: 'wholesaleCenterSalesManagement',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/wholesale_center/sales_management.vue'
-            ),
-          meta: {
-            title: '销售单管理',
-          },
-        },
-        {
-          path: 'inventory_query',
-          name: 'wholesaleCenterInventoryQuery',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/wholesale_center/inventory_query.vue'
-            ),
-          meta: {
-            title: '产品库存查询',
-          },
-        },
-        {
           path: 'product_inventory',
           name: 'wholesaleCenterProductInventory',
           component: () =>
@@ -180,39 +147,6 @@ const routes: RouteRecordRaw = {
           },
         },
         {
-          path: 'material_in',
-          name: 'productionBaseMaterialIn',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/production_base/material_in.vue'
-            ),
-          meta: {
-            title: '物资入库',
-          },
-        },
-        {
-          path: 'material_out',
-          name: 'productionBaseMaterialOut',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/production_base/material_out.vue'
-            ),
-          meta: {
-            title: '物资出库',
-          },
-        },
-        {
-          path: 'material_inventory',
-          name: 'productionBaseMaterialInventory',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/production_base/material_inventory.vue'
-            ),
-          meta: {
-            title: '物资盘点',
-          },
-        },
-        {
           path: 'production_plan_query',
           name: 'productionBaseProductionPlanQuery',
           component: () =>
@@ -221,28 +155,6 @@ const routes: RouteRecordRaw = {
             ),
           meta: {
             title: '生产计划查询',
-          },
-        },
-        {
-          path: 'product_in',
-          name: 'productionBaseProductIn',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/production_base/product_in.vue'
-            ),
-          meta: {
-            title: '产品入库',
-          },
-        },
-        {
-          path: 'product_out',
-          name: 'productionBaseProductOut',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/production_base/product_out.vue'
-            ),
-          meta: {
-            title: '产品出库',
           },
         },
         {
@@ -302,17 +214,6 @@ const routes: RouteRecordRaw = {
           },
         },
         {
-          path: 'product_inventory',
-          name: 'purchasingPointProductInventory',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/purchasing_point/product_inventory.vue'
-            ),
-          meta: {
-            title: '产品盘存',
-          },
-        },
-        {
           path: 'material_in',
           name: 'purchasingPointMaterialIn',
           component: () =>
@@ -332,28 +233,6 @@ const routes: RouteRecordRaw = {
             ),
           meta: {
             title: '物资出库',
-          },
-        },
-        {
-          path: 'material_inventory',
-          name: 'purchasingPointMaterialInventory',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/purchasing_point/material_inventory.vue'
-            ),
-          meta: {
-            title: '物资盘点',
-          },
-        },
-        {
-          path: 'production_plan_query',
-          name: 'purchasingPointProductionPlanQuery',
-          component: () =>
-            import(
-              '@/views/multilevel_menu_example/purchasing_point/production_plan_query.vue'
-            ),
-          meta: {
-            title: '生产计划查询',
           },
         },
       ],

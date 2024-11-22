@@ -5,6 +5,12 @@ export async function createMaterial(material) {
   return response.data
 }
 
+// 获取所有物资信息
+export async function getMaterials() {
+  const response = await api.get('/materials')
+  return response.data
+}
+
 export async function getMaterial(materialNumber) {
   const response = await api.get(`/materials/${materialNumber}`)
   return response.data

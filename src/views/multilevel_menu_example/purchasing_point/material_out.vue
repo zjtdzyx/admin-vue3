@@ -3,6 +3,22 @@ import axios from 'axios'
 import { ElMessageBox } from 'element-plus'
 import { onMounted, reactive, ref } from 'vue'
 
+
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 // 定义接口
 interface materialIN {
   materialNumber: string
@@ -29,7 +45,7 @@ async function fetchTableData() {
   error.value = null
 
   try {
-    const response = await axios.get<materialIN[]>('/materials')
+    const response = await api.get<materialIN[]>('/materials')
     GetData.value = response.data
   }
   catch (err: any) {
@@ -86,7 +102,7 @@ async function onSubmit() {
   // 执行出库操作
   try {
     material.quantity -= quantity // 更新物资库存数量
-    const response = await axios.put(`/materials/${material.materialNumber}`, material)
+    const response = await api.put(`/materials/${material.materialNumber}`, material)
     responsedata.value = response.data
     fetchTableData() // 更新表格数据
     ElMessageBox.alert('物资出库成功！', '成功', {

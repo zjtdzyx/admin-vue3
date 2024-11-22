@@ -3,6 +3,21 @@ import axios from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { computed, onMounted, reactive, ref } from 'vue'
 
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 interface User {
   farmerNumber: string
   name: string
@@ -41,7 +56,7 @@ async function fetchTableData() {
   _error.value = null // 清空错误信息
 
   try {
-    const _response = await axios.get<User[]>('/farmers')
+    const _response = await api.get<User[]>('/farmers')
     GetData.value = _response.data // 将返回的数据赋值给表格数据
   }
   catch (_err: any) {
@@ -60,7 +75,7 @@ onMounted(() => {
 // 提交表单
 async function onSubmit() {
   try {
-    const _response = await axios.post('/farmers', form)
+    const _response = await api.post('/farmers', form)
     ElMessage.success('提交成功')
   }
   catch (_err: any) {
@@ -106,7 +121,7 @@ async function handleBlur(index: any | number) {
       contact: updatedData.contact,
       sowingArea: updatedData.sowingArea,
     }
-    const _response = await axios.put(`/farmers/${payload.farmerNumber}`, payload)
+    const _response = await api.put(`/farmers/${payload.farmerNumber}`, payload)
     if (_response.status === 200) {
       fetchTableData() // 重新获取数据
     }
@@ -135,7 +150,7 @@ async function handleDelete(index: any, row: any) {
       },
     )
     if (confirmDelete) {
-      const _response = await axios.delete(`/farmers/${row.farmerNumber}`)
+      const _response = await api.delete(`/farmers/${row.farmerNumber}`)
       if (_response.status === 204) {
         GetData.value.splice(index, 1)
         ElMessage.success(`农户 ${row.name} 删除成功`)

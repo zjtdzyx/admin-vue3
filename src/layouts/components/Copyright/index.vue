@@ -5,6 +5,7 @@ defineOptions({
   name: 'Copyright',
 })
 
+
 const settingsStore = useSettingsStore()
 </script>
 

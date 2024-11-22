@@ -2,6 +2,22 @@
 import axios from 'axios'
 import { onMounted, reactive, ref } from 'vue'
 
+
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 interface MaterialIN {
   materialNumber: string
   name: string
@@ -20,7 +36,7 @@ async function fetchTableData() {
   loading.value = true
   error.value = null // 清空错误信息
   try {
-    const response = await axios.get<MaterialIN[]>('/materials')
+    const response = await api.get<MaterialIN[]>('/materials')
     GetData.value = response.data // 更新数据
   }
   catch (err: any) {
@@ -51,7 +67,7 @@ const responsedata = ref<any>(null)
 // 提交表单数据
 async function onSubmit() {
   try {
-    const response = await axios.post('/materials', form)
+    const response = await api.post('/materials', form)
     responsedata.value = response.data // 保存响应数据
     // 提交成功后刷新表格数据
     fetchTableData()

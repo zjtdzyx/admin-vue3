@@ -20,7 +20,7 @@ export default defineConfig(({ mode, command }) => {
   })
   return {
     // 开发服务器选项 https://cn.vitejs.dev/config/server-options
-    server: {
+    'server': {
       open: true,
       port: 9000,
       proxy: {
@@ -32,11 +32,11 @@ export default defineConfig(({ mode, command }) => {
       },
     },
     // 构建选项 https://cn.vitejs.dev/config/build-options
-    build: {
+    'build': {
       outDir: mode === 'production' ? 'dist' : `dist-${mode}`,
       sourcemap: env.VITE_BUILD_SOURCEMAP === 'true',
     },
-    define: {
+    'define': {
       __SYSTEM_INFO__: JSON.stringify({
         pkg: {
           version: pkg.version,
@@ -46,20 +46,24 @@ export default defineConfig(({ mode, command }) => {
         lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       }),
     },
-    plugins: createVitePlugins(mode, command === 'build'),
-    resolve: {
+    'plugins': createVitePlugins(mode, command === 'build'),
+    'resolve': {
       alias: {
         '@': path.resolve(__dirname, 'src'),
         '#': path.resolve(__dirname, 'src/types'),
       },
     },
-    css: {
+    'css': {
       preprocessorOptions: {
         scss: {
           api: 'modern-compiler',
           additionalData: scssResources.join(''),
         },
       },
+    },
+    'simple-git-hooks': {
+      'pre-commit': 'npm run lint',
+      'pre-push': 'npm run test',
     },
   }
 })

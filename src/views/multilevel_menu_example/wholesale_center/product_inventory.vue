@@ -2,6 +2,21 @@
 import axios from 'axios'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 
+const api = axios.create({
+
+baseURL:
+
+ import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+
+  ? '/proxy/'
+
+  : import.meta.env.VITE_APP_API_BASEURL,
+
+timeout: 1000 * 60,
+
+responseType: 'json',
+
+})
 interface Product {
   product_number: bigint
   name: string
@@ -51,7 +66,7 @@ onBeforeUnmount(() => {
 // 获取数据的函数
 async function fetchTableData() {
   try {
-    const response = await axios.get('/api/products') // 修改为实际接口地址
+    const response = await api.get('/api/products') // 修改为实际接口地址
     tableData.value = response.data
   }
   catch (error) {
@@ -79,7 +94,7 @@ async function onSubmit() {
 
     try {
       // 更新数据库
-      await axios.put(`/api/products/${selectedProduct.value.product_number}`, {
+      await api.put(`/api/products/${selectedProduct.value.product_number}`, {
         auditedCount: form.value.auditedCount,
         systemCount: form.value.systemCount,
         difference: form.value.difference,
