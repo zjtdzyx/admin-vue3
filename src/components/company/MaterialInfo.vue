@@ -3,21 +3,19 @@ import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTa
 import { onMounted, ref, computed } from 'vue'
 import 'element-plus/dist/index.css'
 
-// 初始化物资数据
+// 初始材料数据
 const initialMaterialInfo = [
-  { materialNumber: 'M001', name: '铁钉', unit: '盒', costPrice: '10元', sellingPrice: '15元' },
-  { materialNumber: 'M002', name: '水泥', unit: '袋', costPrice: '20元', sellingPrice: '25元' },
-  { materialNumber: 'M003', name: '木板', unit: '块', costPrice: '50元', sellingPrice: '70元' },
-  { materialNumber: 'M004', name: '砖块', unit: '块', costPrice: '1元', sellingPrice: '1.5元' },
-  { materialNumber: 'M005', name: '钢筋', unit: '根', costPrice: '100元', sellingPrice: '120元' },
-  { materialNumber: 'M006', name: '砂子', unit: '袋', costPrice: '5元', sellingPrice: '8元' },
-  { materialNumber: 'M007', name: '玻璃', unit: '块', costPrice: '30元', sellingPrice: '40元' },
-  { materialNumber: 'M008', name: '电缆', unit: '米', costPrice: '10元', sellingPrice: '15元' },
-  { materialNumber: 'M009', name: '油漆', unit: '桶', costPrice: '60元', sellingPrice: '80元' },
-  { materialNumber: 'M010', name: '钉枪', unit: '台', costPrice: '200元', sellingPrice: '250元' }
+  { materialNumber: 'M001', name: '化肥', unit: '吨', costPrice: '2000元/吨', sellingPrice: '2500元/吨' },
+  { materialNumber: 'M002', name: '农药', unit: '升', costPrice: '100元/升', sellingPrice: '150元/升' },
+  { materialNumber: 'M003', name: '种子', unit: '公斤', costPrice: '50元/公斤', sellingPrice: '80元/公斤' },
+  { materialNumber: 'M004', name: '饲料', unit: '吨', costPrice: '3000元/吨', sellingPrice: '3500元/吨' },
+  { materialNumber: 'M005', name: '农膜', unit: '卷', costPrice: '500元/卷', sellingPrice: '600元/卷' },
+  { materialNumber: 'M006', name: '滴灌设备', unit: '套', costPrice: '1000元/套', sellingPrice: '1200元/套' },
+  { materialNumber: 'M007', name: '农机配件', unit: '件', costPrice: '200元/件', sellingPrice: '250元/件' },
+  { materialNumber: 'M008', name: '有机肥', unit: '吨', costPrice: '1500元/吨', sellingPrice: '1800元/吨' }
 ]
 
-// 从 localStorage 恢复物资数据
+// 从 localStorage 恢复材料数据
 const storedMaterialInfo = localStorage.getItem('materialInfo')
 const materialInfo = ref(storedMaterialInfo ? JSON.parse(storedMaterialInfo) : [...initialMaterialInfo])
 
@@ -44,41 +42,36 @@ function updateLocalStorage() {
   localStorage.setItem('materialInfo', JSON.stringify(materialInfo.value))
 }
 
-// 添加物资
 function addMaterialHandler() {
   materialInfo.value.push({ ...newMaterial.value })
-  updateLocalStorage() // 更新 localStorage
+  updateLocalStorage()  // 更新 localStorage
   newMaterial.value = { materialNumber: '', name: '', unit: '', costPrice: '', sellingPrice: '' }
   ElMessage.success('Material added successfully')
 }
 
-// 编辑物资
 function editMaterialHandler(material) {
   editingMaterial.value = { ...material }
 }
 
-// 更新物资
 function updateMaterialHandler() {
   const index = materialInfo.value.findIndex(m => m.materialNumber === editingMaterial.value?.materialNumber)
   if (index !== -1 && editingMaterial.value) {
     materialInfo.value[index] = { ...editingMaterial.value }
-    updateLocalStorage() // 更新 localStorage
+    updateLocalStorage()  // 更新 localStorage
     editingMaterial.value = null
     ElMessage.success('Material updated successfully')
   }
 }
 
-// 删除物资
 function removeMaterialHandler(materialNumber) {
   materialInfo.value = materialInfo.value.filter(m => m.materialNumber !== materialNumber)
-  updateLocalStorage() // 更新 localStorage
+  updateLocalStorage()  // 更新 localStorage
   ElMessage.success('Material removed successfully')
 }
 
-// 还原数据
 function restoreDataHandler() {
-  materialInfo.value = [...initialMaterialInfo] // 还原到初始数据
-  updateLocalStorage() // 更新 localStorage
+  materialInfo.value = [...initialMaterialInfo]  // 还原到初始数据
+  updateLocalStorage()  // 更新 localStorage
   ElMessage.success('Data restored to initial state')
 }
 </script>
@@ -87,20 +80,19 @@ function restoreDataHandler() {
   <div class="container">
     <ElCard class="box-card">
       <div class="card-header">
-        <h1>物资信息管理</h1>
+        <h1>材料信息管理</h1>
       </div>
       <!-- 搜索框 -->
       <div class="search-container">
         <ElInput
           v-model="searchQuery"
-          placeholder="输入关键词搜索物资..."
+          placeholder="输入关键词搜索材料..."
           clearable
         />
       </div>
-      
       <ElForm label-width="120px" @submit.prevent="addMaterialHandler">
-        <ElFormItem label="物资编号">
-          <ElInput v-model="newMaterial.materialNumber" placeholder="物资编号" required />
+        <ElFormItem label="材料编号">
+          <ElInput v-model="newMaterial.materialNumber" placeholder="材料编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
           <ElInput v-model="newMaterial.name" placeholder="名称" required />
@@ -116,14 +108,13 @@ function restoreDataHandler() {
         </ElFormItem>
         <ElFormItem class="form-actions">
           <ElButton type="primary" @click="addMaterialHandler">
-            添加物资
+            添加材料
           </ElButton>
         </ElFormItem>
       </ElForm>
-
       <div class="table-container">
         <ElTable :data="filteredMaterialInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="materialNumber" label="物资编号" width="150" />
+          <ElTableColumn prop="materialNumber" label="材料编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
           <ElTableColumn prop="unit" label="单位" width="150" />
           <ElTableColumn prop="costPrice" label="成本价" width="150" />
@@ -150,11 +141,11 @@ function restoreDataHandler() {
     <div v-if="editingMaterial" class="edit-container">
       <ElCard class="box-card">
         <div class="card-header">
-          <h2>编辑物资</h2>
+          <h2>编辑材料</h2>
         </div>
         <ElForm label-width="120px" @submit.prevent="updateMaterialHandler">
-          <ElFormItem label="物资编号">
-            <ElInput v-model="editingMaterial.materialNumber" placeholder="物资编号" required />
+          <ElFormItem label="材料编号">
+            <ElInput v-model="editingMaterial.materialNumber" placeholder="材料编号" required />
           </ElFormItem>
           <ElFormItem label="名称">
             <ElInput v-model="editingMaterial.name" placeholder="名称" required />
@@ -170,7 +161,7 @@ function restoreDataHandler() {
           </ElFormItem>
           <ElFormItem class="form-actions">
             <ElButton type="primary" @click="updateMaterialHandler">
-              更新物资
+              更新材料
             </ElButton>
             <ElButton @click="editingMaterial = null">
               取消
@@ -181,6 +172,8 @@ function restoreDataHandler() {
     </div>
   </div>
 </template>
+
+
 
 <style scoped>
 .container {

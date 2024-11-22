@@ -3,25 +3,23 @@ import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTa
 import { onMounted, ref, computed } from 'vue'
 import 'element-plus/dist/index.css'
 
-// 初始化死数据
-const initialCustomerInfo = [
-  { customerNumber: 'C001', name: '张三', contact: '13800000001', address: '北京市' },
-  { customerNumber: 'C002', name: '李四', contact: '13800000002', address: '上海市' },
-  { customerNumber: 'C003', name: '王五', contact: '13800000003', address: '广州市' },
-  { customerNumber: 'C004', name: '赵六', contact: '13800000004', address: '深圳市' },
-  { customerNumber: 'C005', name: '孙七', contact: '13800000005', address: '杭州市' },
-  { customerNumber: 'C006', name: '周八', contact: '13800000006', address: '南京市' },
-  { customerNumber: 'C007', name: '吴九', contact: '13800000007', address: '武汉市' },
-  { customerNumber: 'C008', name: '郑十', contact: '13800000008', address: '重庆市' },
-  { customerNumber: 'C009', name: '冯十一', contact: '13800000009', address: '成都市' },
-  { customerNumber: 'C010', name: '陈十二', contact: '13800000010', address: '苏州市' }
+const defaultCustomerInfo = [
+  { customerNumber: '001', name: '张三', contact: '123456789', address: '北京市' },
+  { customerNumber: '002', name: '李四', contact: '987654321', address: '上海市' },
+  { customerNumber: '003', name: '王五', contact: '456123789', address: '广州市' },
+  { customerNumber: '004', name: '赵六', contact: '321654987', address: '深圳市' },
+  { customerNumber: '005', name: '孙七', contact: '789123456', address: '杭州市' },
+  { customerNumber: '006', name: '周八', contact: '654789123', address: '成都市' },
+  { customerNumber: '007', name: '吴九', contact: '123789456', address: '南京市' },
+  { customerNumber: '008', name: '郑十', contact: '987321654', address: '苏州市' },
+  { customerNumber: '009', name: '王十一', contact: '456987123', address: '武汉市' },
+  { customerNumber: '010', name: '李十二', contact: '321987654', address: '长沙市' }
 ]
 
-// 从 localStorage 恢复客户数据
-const storedCustomerInfo = localStorage.getItem('customerInfo')
-const customerInfo = ref(storedCustomerInfo ? JSON.parse(storedCustomerInfo) : [...initialCustomerInfo])
+const customerInfo = ref<any[]>(JSON.parse(localStorage.getItem('customerInfo') || JSON.stringify(defaultCustomerInfo)))
 
 const searchQuery = ref('')
+
 const filteredCustomerInfo = computed(() => {
   const query = searchQuery.value.trim().toLowerCase()
   if (!query) return customerInfo.value
@@ -35,49 +33,48 @@ const filteredCustomerInfo = computed(() => {
 const newCustomer = ref({ customerNumber: '', name: '', contact: '', address: '' })
 const editingCustomer = ref<{ customerNumber: string, name: string, contact: string, address: string } | null>(null)
 
-// 更新 localStorage 中的客户数据
-function updateLocalStorage() {
+onMounted(() => {
+  ElMessage.success('Customer info loaded successfully')
+})
+
+function saveToLocalStorage() {
   localStorage.setItem('customerInfo', JSON.stringify(customerInfo.value))
 }
 
-// 添加客户
 function addCustomerHandler() {
   customerInfo.value.push({ ...newCustomer.value })
-  updateLocalStorage()
   newCustomer.value = { customerNumber: '', name: '', contact: '', address: '' }
+  saveToLocalStorage()
   ElMessage.success('Customer added successfully')
 }
 
-// 编辑客户
-function editCustomerHandler(customer) {
+function editCustomerHandler(customer: any) {
   editingCustomer.value = { ...customer }
 }
 
-// 更新客户
 function updateCustomerHandler() {
   const index = customerInfo.value.findIndex(c => c.customerNumber === editingCustomer.value?.customerNumber)
   if (index !== -1 && editingCustomer.value) {
     customerInfo.value[index] = { ...editingCustomer.value }
-    updateLocalStorage()
     editingCustomer.value = null
+    saveToLocalStorage()
     ElMessage.success('Customer updated successfully')
   }
 }
 
-// 删除客户
-function removeCustomerHandler(customerNumber) {
+function removeCustomerHandler(customerNumber: string) {
   customerInfo.value = customerInfo.value.filter(c => c.customerNumber !== customerNumber)
-  updateLocalStorage()
+  saveToLocalStorage()
   ElMessage.success('Customer removed successfully')
 }
 
-// 还原数据
-function restoreDataHandler() {
-  customerInfo.value = [...initialCustomerInfo]  // 还原到初始数据
-  updateLocalStorage()
-  ElMessage.success('Data restored to initial state')
+function restoreDefaultData() {
+  customerInfo.value = [...defaultCustomerInfo]
+  saveToLocalStorage()
+  ElMessage.success('Data restored to default values')
 }
 </script>
+
 <template>
   <div class="container">
     <ElCard class="box-card">
@@ -131,8 +128,9 @@ function restoreDataHandler() {
           </ElTableColumn>
         </ElTable>
       </div>
+      
+      <ElButton type="warning" @click="restoreDefaultData">还原数据</ElButton>
     </ElCard>
-
     <div v-if="editingCustomer" class="edit-container">
       <ElCard class="box-card">
         <div class="card-header">
@@ -162,14 +160,9 @@ function restoreDataHandler() {
         </ElForm>
       </ElCard>
     </div>
-
-    <div class="restore-container">
-      <ElButton type="warning" @click="restoreDataHandler">
-        还原数据
-      </ElButton>
-    </div>
   </div>
 </template>
+
 <style scoped>
 .container {
   padding: 20px;
@@ -218,10 +211,5 @@ h1 {
 
 .edit-container {
   margin-top: 20px;
-}
-
-.restore-container {
-  margin-top: 20px;
-  text-align: center;
 }
 </style>
