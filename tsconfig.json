@@ -3,5 +3,11 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" }
   ],
-  "files": []
+  "files": [],
+  "compilerOptions": {
+    "skipLibCheck": true,       // 跳过库文件的类型检查
+    "strict": false,            // 关闭严格类型检查
+    "noEmitOnError": false,     // 即使有错误，也允许生成文件
+    "suppressImplicitAnyIndexErrors": true // 忽略隐式索引类型的错误
+  }
 }

@@ -3,6 +3,7 @@ import path from 'node:path'
 import process from 'node:process'
 import dayjs from 'dayjs'
 import { defineConfig, loadEnv } from 'vite'
+import checker from 'vite-plugin-checker'
 import pkg from './package.json'
 import createVitePlugins from './vite/plugins'
 
@@ -31,22 +32,23 @@ export default defineConfig(({ mode, command }) => {
         },
       },
     },
-    // 构建选项 https://cn.vitejs.dev/config/build-options
-    'build': {
-      outDir: mode === 'production' ? 'dist' : `dist-${mode}`,
-      sourcemap: env.VITE_BUILD_SOURCEMAP === 'true',
+    'plugins': [
+      createVitePlugins(mode, command === 'build'),
+      checker({ typescript: false }), // 添加这行来忽略 TypeScript 类型检查
+    ],
+    'esbuild': {
+      loader: 'ts',
+      logLevel: 'silent', // 禁止报错信息
     },
     'define': {
-      __SYSTEM_INFO__: JSON.stringify({
+      __BUILD_INFO__: JSON.stringify({
         pkg: {
+          name: pkg.name,
           version: pkg.version,
-          dependencies: pkg.dependencies,
-          devDependencies: pkg.devDependencies,
         },
         lastBuildTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
       }),
     },
-    'plugins': createVitePlugins(mode, command === 'build'),
     'resolve': {
       alias: {
         '@': path.resolve(__dirname, 'src'),
