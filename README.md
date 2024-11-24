@@ -4,16 +4,14 @@
 
 > 两种主题：白天和黑夜
 
-```html
-<img src="@\assets\images\image-20241124203328240.png" alt="image-20241124203328240" />
-<img src="@\assets\images\image-20241124203340897.png" alt="image-20241124203340897" />
-<img src="@\assets\images\image-20241124203348653.png" alt="image-20241124203348653" />
-<img src="@\assets\images\image-20241124203356537.png" alt="image-20241124203356537" />
-<img src="@\assets\images\image-20241124203405287.png" alt="image-20241124203405287" />
-<img src="@\assets\images\image-20241124203422163.png" alt="image-20241124203422163" />
-<img src="@\assets\images\image-20241124203430531.png" alt="image-20241124203430531" />
-<img src="@\assets\images\image-20241124203438073.png" alt="image-20241124203438073" />
-```
+![image-20241124203328240](src/assets/images/image-20241124203328240.png)
+![image-20241124203340897](src/assets/images/image-20241124203340897.png)
+![image-20241124203348653](src/assets/images/image-20241124203348653.png)
+![image-20241124203356537](src/assets/images/image-20241124203356537.png)
+![image-20241124203405287](src/assets/images/image-20241124203405287.png)
+![image-20241124203422163](src/assets/images/image-20241124203422163.png)
+![image-20241124203430531](src/assets/images/image-20241124203430531.png)
+![image-20241124203438073](src/assets/images/image-20241124203438073.png)
 
 ## 简介
 
