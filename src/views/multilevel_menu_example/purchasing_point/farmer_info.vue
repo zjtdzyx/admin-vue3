@@ -1,270 +1,235 @@
 <script setup lang="ts">
-import axios from 'axios'
-import { ElMessage, ElMessageBox } from 'element-plus'
-import { computed, onMounted, reactive, ref } from 'vue'
+  import { ElMessage, ElMessageBox } from 'element-plus'
+  import { computed, reactive, ref, onMounted } from 'vue'
 
-const api = axios.create({
+  // 模拟的初始数据
+  const originalData = [
+    { farmerNumber: 'F001', name: '张三', address: 'A村', contact: '1234567890', sowingArea: '50亩' },
+    { farmerNumber: 'F002', name: '李四', address: 'B村', contact: '2345678901', sowingArea: '30亩' },
+    { farmerNumber: 'F003', name: '王五', address: 'C村', contact: '3456789012', sowingArea: '40亩' },
+    { farmerNumber: 'F004', name: '赵六', address: 'D村', contact: '4567890123', sowingArea: '60亩' },
+    { farmerNumber: 'F005', name: '孙七', address: 'E村', contact: '5678901234', sowingArea: '20亩' },
+    { farmerNumber: 'F006', name: '周八', address: 'F村', contact: '6789012345', sowingArea: '70亩' },
+    { farmerNumber: 'F007', name: '吴九', address: 'A村', contact: '7890123456', sowingArea: '10亩' },
+    { farmerNumber: 'F008', name: '郑十', address: 'B村', contact: '8901234567', sowingArea: '80亩' },
+    { farmerNumber: 'F009', name: '冯十一', address: 'C村', contact: '9012345678', sowingArea: '90亩' },
+    { farmerNumber: 'F010', name: '陈十二', address: 'D村', contact: '0123456789', sowingArea: '100亩' },
+  ]
 
-baseURL:
+  // 表格数据
+  const GetData = ref([...originalData]) // 初始化表格数据
 
- import.meta.env.DEV && import.meta.env.VITE_OPEN_PROXY === 'true'
+  // 表单数据
+  const form = reactive({
+    farmerNumber: '',
+    name: '',
+    address: '',
+    contact: '',
+    sowingArea: '',
+  })
+  const dialogVisible = ref(false) // 控制弹窗显示
 
-  ? '/proxy/'
+  // 搜索框数据
+  const search = ref('')
+  const filterTableData = computed(() => {
+    if (!search.value) {
+      return GetData.value
+    }
+    return GetData.value.filter(item =>
+      item.name.toLowerCase().includes(search.value.toLowerCase()) ||
+      item.farmerNumber.toLowerCase().includes(search.value.toLowerCase())
+    )
+  })
 
-  : import.meta.env.VITE_APP_API_BASEURL,
+  // 当前编辑状态
+  const editIndex = ref<number | null>(null)
+  const editColumn = ref<string>('')
 
-timeout: 1000 * 60,
+  // 本地存储初始化
+  onMounted(() => {
+    const localData = localStorage.getItem('farmersData')
+    if (localData) {
+      GetData.value = JSON.parse(localData)
+    } else {
+      localStorage.setItem('farmersData', JSON.stringify(GetData.value))
+    }
+  })
 
-responseType: 'json',
-
-})
-interface User {
-  farmerNumber: string
-  name: string
-  address: string
-  contact: string
-  sowingArea: string
-}
-
-const form = reactive({
-  farmerNumber: '',
-  name: '',
-  address: '',
-  contact: '',
-  sowingArea: '',
-})
-
-const GetData = ref<User[]>([]) // 表格数据
-const loading = ref<boolean>(false) // 请求状态
-const _error = ref<string | null>(null) // 错误信息
-
-const search = ref('')
-const filterTableData = computed(() => {
-  if (!search.value) {
-    return GetData.value // 如果没有搜索词，返回所有数据
+  // 保存本地存储
+  function saveToLocalStorage() {
+    localStorage.setItem('farmersData', JSON.stringify(GetData.value))
   }
-  // 否则，根据 `search` 字段过滤数据
-  return GetData.value.filter(item =>
-    item.name.toLowerCase().includes(search.value.toLowerCase())
-    || item.farmerNumber.toLowerCase().includes(search.value.toLowerCase()),
-  )
-})
 
-// 数据请求函数
-async function fetchTableData() {
-  loading.value = true // 开始加载
-  _error.value = null // 清空错误信息
+  // 还原功能
+  function restoreData() {
+    GetData.value = [...originalData]
+    saveToLocalStorage()
+    ElMessage.success('数据已还原到初始状态！')
+  }
 
-  try {
-    const _response = await api.get<User[]>('/farmers')
-    GetData.value = _response.data // 将返回的数据赋值给表格数据
+  // 提交表单
+  function onSubmit() {
+    if (!form.farmerNumber || !form.name) {
+      ElMessage.error('请填写完整表单！')
+      return
+    }
+    GetData.value.push({ ...form })
+    saveToLocalStorage()
+    Object.keys(form).forEach(key => (form[key as keyof typeof form] = ''))
+    dialogVisible.value = false
+    ElMessage.success('添加成功！')
   }
-  catch (_err: any) {
-    _error.value = _err.message || 'Failed to fetch data' // 捕获并显示错误
-  }
-  finally {
-    loading.value = false // 请求完成，停止加载
-  }
-}
 
-// 组件加载时，自动调用 fetchTableData
-onMounted(() => {
-  fetchTableData()
-})
-
-// 提交表单
-async function onSubmit() {
-  try {
-    const _response = await api.post('/farmers', form)
-    ElMessage.success('提交成功')
-  }
-  catch (_err: any) {
-    _error.value = _err.message || 'Failed to submit data'
-    ElMessage.error('提交失败')
-  }
-  finally {
-    loading.value = false // 请求完成，停止加载
-  }
-}
-
-// 编辑相关变量
-const editIndex = ref(null) // 当前正在编辑的行的索引
-const editColumn = ref('') // 当前正在编辑的列的名称
-
-// 点击编辑按钮时调用，设置当前编辑的行
-function handleEdit(index: any, _row?: any) {
-  if (editIndex.value === index) {
-    editIndex.value = null
-    editColumn.value = ''
-  }
-  else {
+  // 编辑功能
+  function handleEdit(index: number) {
     editIndex.value = index
-    editColumn.value = 'farmerNumber' // 编辑列
+    editColumn.value = '' // 默认不指定列，允许整行编辑
   }
-}
 
-// 点击单元格时调用，设置当前编辑的单元格
-function handleCellClick(index: any, column: any) {
-  if (editIndex.value === index) {
+  function handleCellClick(index: number, column: string) {
+    editIndex.value = index
     editColumn.value = column
   }
-}
 
-// 输入框失去焦点时调用，结束编辑状态
-async function handleBlur(index: any | number) {
-  try {
-    const updatedData = GetData.value[index]
-    const payload = {
-      farmerNumber: updatedData.farmerNumber,
-      name: updatedData.name,
-      address: updatedData.address,
-      contact: updatedData.contact,
-      sowingArea: updatedData.sowingArea,
-    }
-    const _response = await api.put(`/farmers/${payload.farmerNumber}`, payload)
-    if (_response.status === 200) {
-      fetchTableData() // 重新获取数据
-    }
-    else {
-      ElMessage.error('更新失败')
-    }
-  }
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  catch (_error) { // 将 error 重命名为 _error
-    ElMessage.error('请求更新失败')
+  function handleBlur() {
+    saveToLocalStorage()
     editIndex.value = null
     editColumn.value = ''
+    ElMessage.success('修改成功！')
   }
-}
 
-// 删除操作
-async function handleDelete(index: any, row: any) {
-  try {
-    const confirmDelete = await ElMessageBox.confirm(
+  // 删除操作
+  function handleDelete(index: number, row: any) {
+    ElMessageBox.confirm(
       `确定要删除农户 ${row.name} 吗？`,
       '提示',
       {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning',
-      },
+      }
     )
-    if (confirmDelete) {
-      const _response = await api.delete(`/farmers/${row.farmerNumber}`)
-      if (_response.status === 204) {
+      .then(() => {
         GetData.value.splice(index, 1)
-        ElMessage.success(`农户 ${row.name} 删除成功`)
-      }
-      else {
-        ElMessage.error('删除失败')
-      }
-    }
+        saveToLocalStorage()
+        ElMessage.success(`农户 ${row.name} 删除成功！`)
+      })
+      .catch(() => {
+        ElMessage.info('已取消删除操作')
+      })
   }
-  // eslint-disable-next-line unused-imports/no-unused-vars
-  catch (_error) { // 将 error 重命名为 _error
-    ElMessage.error('删除失败')
-  }
-}
 </script>
 
 <template>
   <div>
+    <!-- 搜索框 -->
+    <el-input v-model="search" size="small" placeholder="搜索农户信息" style="margin-bottom: 15px;" clearable />
+
+    <!-- 表格 -->
     <el-table :data="filterTableData" style="width: 100%;">
-      <el-table-column label="农户编号" prop="farmerNumber">
+      <el-table-column prop="farmerNumber" label="农户编号">
         <template #default="scope">
-          <el-input
-            v-if="editIndex === scope.$index && editColumn === 'farmerNumber'" v-model="scope.row.farmerNumber"
-            size="small" placeholder="请输入农户编号" @blur="handleBlur"
-          />
+          <el-input v-if="editIndex === scope.$index && (!editColumn || editColumn === 'farmerNumber')"
+            v-model="scope.row.farmerNumber" size="small" @blur="handleBlur" />
           <span v-else @click="handleCellClick(scope.$index, 'farmerNumber')">{{ scope.row.farmerNumber }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="农户名称" prop="name">
+      <el-table-column prop="name" label="农户名称">
         <template #default="scope">
-          <el-input
-            v-if="editIndex === scope.$index && editColumn === 'name'" v-model="scope.row.name"
-            size="small" placeholder="请输入农户名称" @blur="handleBlur"
-          />
+          <el-input v-if="editIndex === scope.$index && (!editColumn || editColumn === 'name')" v-model="scope.row.name"
+            size="small" @blur="handleBlur" />
           <span v-else @click="handleCellClick(scope.$index, 'name')">{{ scope.row.name }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="农户住址" prop="address">
+      <el-table-column prop="address" label="农户住址">
         <template #default="scope">
-          <el-input
-            v-if="editIndex === scope.$index && editColumn === 'address'" v-model="scope.row.address"
-            size="small" placeholder="请输入农户住址" @blur="handleBlur"
-          />
+          <el-input v-if="editIndex === scope.$index && (!editColumn || editColumn === 'address')"
+            v-model="scope.row.address" size="small" @blur="handleBlur" />
           <span v-else @click="handleCellClick(scope.$index, 'address')">{{ scope.row.address }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="联系电话" prop="contact">
+      <el-table-column prop="contact" label="联系电话">
         <template #default="scope">
-          <el-input
-            v-if="editIndex === scope.$index && editColumn === 'contact'" v-model="scope.row.contact"
-            size="small" placeholder="请输入联系电话" @blur="handleBlur"
-          />
+          <el-input v-if="editIndex === scope.$index && (!editColumn || editColumn === 'contact')"
+            v-model="scope.row.contact" size="small" @blur="handleBlur" />
           <span v-else @click="handleCellClick(scope.$index, 'contact')">{{ scope.row.contact }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column label="播种面积" prop="sowingArea">
+      <el-table-column prop="sowingArea" label="播种面积">
         <template #default="scope">
-          <el-input
-            v-if="editIndex === scope.$index && editColumn === 'sowingArea'" v-model="scope.row.sowingArea"
-            size="small" placeholder="请输入播种面积" @blur="handleBlur"
-          />
+          <el-input v-if="editIndex === scope.$index && (!editColumn || editColumn === 'sowingArea')"
+            v-model="scope.row.sowingArea" size="small" @blur="handleBlur" />
           <span v-else @click="handleCellClick(scope.$index, 'sowingArea')">{{ scope.row.sowingArea }}</span>
         </template>
       </el-table-column>
-
-      <el-table-column align="right">
-        <template #header>
-          <el-input v-model="search" size="small" placeholder="Type to search" />
-        </template>
-
+      <el-table-column label="操作">
         <template #default="scope">
-          <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
-            编辑
-          </el-button>
-
-          <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">
-            删除
+          <el-button size="small" type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index)"> 编辑 </el-button>
+          <el-button size="small" type="danger" icon="el-icon-delete" @click="handleDelete(scope.$index, scope.row)">删除
           </el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-form :model="form" label-width="100" style="max-width: 600px;">
-      <el-form-item label="农户编号">
-        <el-input v-model="form.farmerNumber" />
-      </el-form-item>
-      <el-form-item label="农户姓名">
-        <el-input v-model="form.name" />
-      </el-form-item>
-      <el-form-item label="农户住址">
-        <el-select v-model="form.address" placeholder="请选择所在村">
-          <el-option label="A村" value="A村" />
-          <el-option label="B村" value="B村" />
-          <el-option label="C村" value="C村" />
-          <el-option label="D村" value="D村" />
-          <el-option label="E村" value="E村" />
-          <el-option label="F村" value="F村" />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="联系方式">
-        <el-input v-model="form.contact" />
-      </el-form-item>
-      <el-form-item label="种植面积">
-        <el-input v-model="form.sowingArea" />
-      </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmit">
-          提交
-        </el-button>
-      </el-form-item>
-    </el-form>
+    <!-- 添加表单按钮 -->
+    <el-button type="primary" style="margin-top: 15px;" @click="dialogVisible = true">
+      添加农户
+    </el-button>
+    <el-button type="warning" style="margin-top: 15px;" @click="restoreData">
+      还原数据
+    </el-button>
+
+    <!-- 添加农户表单弹窗 -->
+    <el-dialog v-model="dialogVisible" title="添加农户">
+      <el-form :model="form" label-width="100px">
+        <el-form-item label="农户编号">
+          <el-input v-model="form.farmerNumber" />
+        </el-form-item>
+        <el-form-item label="农户名称">
+          <el-input v-model="form.name" />
+        </el-form-item>
+        <el-form-item label="农户住址">
+          <el-input v-model="form.address" />
+        </el-form-item>
+        <el-form-item label="联系电话">
+          <el-input v-model="form.contact" />
+        </el-form-item>
+        <el-form-item label="播种面积">
+          <el-input v-model="form.sowingArea" />
+        </el-form-item>
+      </el-form>
+      <div>
+        <el-button type="primary" @click="onSubmit">提交</el-button>
+        <el-button @click="dialogVisible = false">取消</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
+
+
+<style scoped>
+  .container {
+    padding: 20px;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .search-bar {
+    width: 300px;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+
+  .el-button {
+    margin-right: 10px;
+  }
+</style>

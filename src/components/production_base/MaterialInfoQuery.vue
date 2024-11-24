@@ -1,57 +1,78 @@
 <script setup lang="ts">
 import { ElButton, ElCard, ElForm, ElFormItem, ElInput, ElMessage, ElTable, ElTableColumn } from 'element-plus'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import 'element-plus/dist/index.css'
 
-const productInfo = ref([
-  { product_number: 'P001', name: '产品A', grade: '一级', origin: '中国', cost_price: '100', packaging: '盒装', inbound_date: '2023-01-01', quantity: '1000', auditedCount: '1000', systemCount: '1000', difference: '0' },
-  { product_number: 'P002', name: '产品B', grade: '二级', origin: '美国', cost_price: '200', packaging: '袋装', inbound_date: '2023-02-01', quantity: '2000', auditedCount: '2000', systemCount: '2000', difference: '0' },
-])
-const newProduct = ref({ product_number: '', name: '', grade: '', origin: '', cost_price: '', packaging: '', inbound_date: '', quantity: '', auditedCount: '', systemCount: '', difference: '' })
-const editingProduct = ref<{ product_number: string, name: string, grade: string, origin: string, cost_price: string, packaging: string, inbound_date: string, quantity: string, auditedCount: string, systemCount: string, difference: string } | null>(null)
+// 初始材料数据
+const initialMaterialInfo = [
+  { materialNumber: 'M001', name: '化肥', unit: '吨', costPrice: '2000元/吨', sellingPrice: '2500元/吨' },
+  { materialNumber: 'M002', name: '农药', unit: '升', costPrice: '100元/升', sellingPrice: '150元/升' },
+  { materialNumber: 'M003', name: '种子', unit: '公斤', costPrice: '50元/公斤', sellingPrice: '80元/公斤' },
+  { materialNumber: 'M004', name: '饲料', unit: '吨', costPrice: '3000元/吨', sellingPrice: '3500元/吨' },
+  { materialNumber: 'M005', name: '农膜', unit: '卷', costPrice: '500元/卷', sellingPrice: '600元/卷' },
+  { materialNumber: 'M006', name: '滴灌设备', unit: '套', costPrice: '1000元/套', sellingPrice: '1200元/套' },
+  { materialNumber: 'M007', name: '农机配件', unit: '件', costPrice: '200元/件', sellingPrice: '250元/件' },
+  { materialNumber: 'M008', name: '有机肥', unit: '吨', costPrice: '1500元/吨', sellingPrice: '1800元/吨' }
+]
 
-onMounted(() => {
-  // 模拟获取产品信息
-  ElMessage.success('Product info loaded successfully')
+// 从 localStorage 恢复材料数据
+const storedMaterialInfo = localStorage.getItem('materialInfo')
+const materialInfo = ref(storedMaterialInfo ? JSON.parse(storedMaterialInfo) : [...initialMaterialInfo])
+
+const searchQuery = ref('')
+const filteredMaterialInfo = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase()
+  if (!query) return materialInfo.value
+  return materialInfo.value.filter(material =>
+    Object.values(material).some(value =>
+      String(value).toLowerCase().includes(query)
+    )
+  )
 })
 
-function addProductHandler() {
-  try {
-    productInfo.value.push({ ...newProduct.value })
-    newProduct.value = { product_number: '', name: '', grade: '', origin: '', cost_price: '', packaging: '', inbound_date: '', quantity: '', auditedCount: '', systemCount: '', difference: '' }
-    ElMessage.success('Product added successfully')
-  }
-  catch {
-    ElMessage.error('Failed to add product')
+const newMaterial = ref({ materialNumber: '', name: '', unit: '', costPrice: '', sellingPrice: '' })
+const editingMaterial = ref<{ materialNumber: string, name: string, unit: string, costPrice: string, sellingPrice: string } | null>(null)
+
+onMounted(() => {
+  ElMessage.success('Material info loaded successfully')
+})
+
+// 保存数据到 localStorage
+function updateLocalStorage() {
+  localStorage.setItem('materialInfo', JSON.stringify(materialInfo.value))
+}
+
+function addMaterialHandler() {
+  materialInfo.value.push({ ...newMaterial.value })
+  updateLocalStorage()  // 更新 localStorage
+  newMaterial.value = { materialNumber: '', name: '', unit: '', costPrice: '', sellingPrice: '' }
+  ElMessage.success('Material added successfully')
+}
+
+function editMaterialHandler(material) {
+  editingMaterial.value = { ...material }
+}
+
+function updateMaterialHandler() {
+  const index = materialInfo.value.findIndex(m => m.materialNumber === editingMaterial.value?.materialNumber)
+  if (index !== -1 && editingMaterial.value) {
+    materialInfo.value[index] = { ...editingMaterial.value }
+    updateLocalStorage()  // 更新 localStorage
+    editingMaterial.value = null
+    ElMessage.success('Material updated successfully')
   }
 }
 
-function editProductHandler(product) {
-  editingProduct.value = { ...product }
+function removeMaterialHandler(materialNumber) {
+  materialInfo.value = materialInfo.value.filter(m => m.materialNumber !== materialNumber)
+  updateLocalStorage()  // 更新 localStorage
+  ElMessage.success('Material removed successfully')
 }
 
-function updateProductHandler() {
-  try {
-    const index = productInfo.value.findIndex(p => p.product_number === editingProduct.value.product_number)
-    if (index !== -1) {
-      productInfo.value[index] = { ...editingProduct.value }
-    }
-    editingProduct.value = null
-    ElMessage.success('Product updated successfully')
-  }
-  catch {
-    ElMessage.error('Failed to update product')
-  }
-}
-
-function removeProductHandler(product_number) {
-  try {
-    productInfo.value = productInfo.value.filter(p => p.product_number !== product_number)
-    ElMessage.success('Product removed successfully')
-  }
-  catch {
-    ElMessage.error('Failed to remove product')
-  }
+function restoreDataHandler() {
+  materialInfo.value = [...initialMaterialInfo]  // 还原到初始数据
+  updateLocalStorage()  // 更新 localStorage
+  ElMessage.success('Data restored to initial state')
 }
 </script>
 
@@ -59,118 +80,90 @@ function removeProductHandler(product_number) {
   <div class="container">
     <ElCard class="box-card">
       <div class="card-header">
-        <h1>产品信息管理</h1>
+        <h1>材料信息管理</h1>
       </div>
-      <ElForm label-width="120px" @submit.prevent="addProductHandler">
-        <ElFormItem label="产品编号">
-          <ElInput v-model="newProduct.product_number" placeholder="产品编号" required />
+      <!-- 搜索框 -->
+      <div class="search-container">
+        <ElInput
+          v-model="searchQuery"
+          placeholder="输入关键词搜索材料..."
+          clearable
+        />
+      </div>
+      <ElForm label-width="120px" @submit.prevent="addMaterialHandler">
+        <ElFormItem label="材料编号">
+          <ElInput v-model="newMaterial.materialNumber" placeholder="材料编号" required />
         </ElFormItem>
         <ElFormItem label="名称">
-          <ElInput v-model="newProduct.name" placeholder="名称" required />
+          <ElInput v-model="newMaterial.name" placeholder="名称" required />
         </ElFormItem>
-        <ElFormItem label="等级">
-          <ElInput v-model="newProduct.grade" placeholder="等级" required />
-        </ElFormItem>
-        <ElFormItem label="产地">
-          <ElInput v-model="newProduct.origin" placeholder="产地" required />
+        <ElFormItem label="单位">
+          <ElInput v-model="newMaterial.unit" placeholder="单位" required />
         </ElFormItem>
         <ElFormItem label="成本价">
-          <ElInput v-model="newProduct.cost_price" placeholder="成本价" required />
+          <ElInput v-model="newMaterial.costPrice" placeholder="成本价" required />
         </ElFormItem>
-        <ElFormItem label="包装">
-          <ElInput v-model="newProduct.packaging" placeholder="包装" required />
-        </ElFormItem>
-        <ElFormItem label="入库日期">
-          <ElInput v-model="newProduct.inbound_date" placeholder="入库日期" required />
-        </ElFormItem>
-        <ElFormItem label="数量">
-          <ElInput v-model="newProduct.quantity" placeholder="数量" required />
-        </ElFormItem>
-        <ElFormItem label="盘点前数量">
-          <ElInput v-model="newProduct.auditedCount" placeholder="盘点前数量" required />
-        </ElFormItem>
-        <ElFormItem label="盘点后数量">
-          <ElInput v-model="newProduct.systemCount" placeholder="盘点后数量" required />
-        </ElFormItem>
-        <ElFormItem label="盘点前后差异">
-          <ElInput v-model="newProduct.difference" placeholder="盘点前后差异" required />
+        <ElFormItem label="售价">
+          <ElInput v-model="newMaterial.sellingPrice" placeholder="售价" required />
         </ElFormItem>
         <ElFormItem class="form-actions">
-          <ElButton type="primary" @click="addProductHandler">
-            添加产品
+          <ElButton type="primary" @click="addMaterialHandler">
+            添加材料
           </ElButton>
         </ElFormItem>
       </ElForm>
       <div class="table-container">
-        <ElTable :data="productInfo" style="width: auto; margin: 0 auto;" height="400" border>
-          <ElTableColumn prop="product_number" label="产品编号" width="150" />
+        <ElTable :data="filteredMaterialInfo" style="width: auto; margin: 0 auto;" height="400" border>
+          <ElTableColumn prop="materialNumber" label="材料编号" width="150" />
           <ElTableColumn prop="name" label="名称" width="150" />
-          <ElTableColumn prop="grade" label="等级" width="150" />
-          <ElTableColumn prop="origin" label="产地" width="150" />
-          <ElTableColumn prop="cost_price" label="成本价" width="150" />
-          <ElTableColumn prop="packaging" label="包装" width="150" />
-          <ElTableColumn prop="inbound_date" label="入库日期" width="150" />
-          <ElTableColumn prop="quantity" label="数量" width="150" />
-          <ElTableColumn prop="auditedCount" label="盘点前数量" width="150" />
-          <ElTableColumn prop="systemCount" label="盘点后数量" width="150" />
-          <ElTableColumn prop="difference" label="盘点前后差异" width="150" />
+          <ElTableColumn prop="unit" label="单位" width="150" />
+          <ElTableColumn prop="costPrice" label="成本价" width="150" />
+          <ElTableColumn prop="sellingPrice" label="售价" width="150" />
           <ElTableColumn label="操作" width="150">
             <template #default="scope">
-              <ElButton type="primary" size="small" @click="editProductHandler(scope.row)">
+              <ElButton type="primary" size="small" @click="editMaterialHandler(scope.row)">
                 编辑
               </ElButton>
-              <ElButton type="danger" size="small" @click="removeProductHandler(scope.row.product_number)">
+              <ElButton type="danger" size="small" @click="removeMaterialHandler(scope.row.materialNumber)">
                 删除
               </ElButton>
             </template>
           </ElTableColumn>
         </ElTable>
       </div>
+      <!-- 还原按钮 -->
+      <div class="restore-container">
+        <ElButton type="warning" @click="restoreDataHandler">
+          还原数据
+        </ElButton>
+      </div>
     </ElCard>
-    <div v-if="editingProduct" class="edit-container">
+    <div v-if="editingMaterial" class="edit-container">
       <ElCard class="box-card">
         <div class="card-header">
-          <h2>编辑产品</h2>
+          <h2>编辑材料</h2>
         </div>
-        <ElForm label-width="120px" @submit.prevent="updateProductHandler">
-          <ElFormItem label="产品编号">
-            <ElInput v-model="editingProduct.product_number" placeholder="产品编号" required />
+        <ElForm label-width="120px" @submit.prevent="updateMaterialHandler">
+          <ElFormItem label="材料编号">
+            <ElInput v-model="editingMaterial.materialNumber" placeholder="材料编号" required />
           </ElFormItem>
           <ElFormItem label="名称">
-            <ElInput v-model="editingProduct.name" placeholder="名称" required />
+            <ElInput v-model="editingMaterial.name" placeholder="名称" required />
           </ElFormItem>
-          <ElFormItem label="等级">
-            <ElInput v-model="editingProduct.grade" placeholder="等级" required />
-          </ElFormItem>
-          <ElFormItem label="产地">
-            <ElInput v-model="editingProduct.origin" placeholder="产地" required />
+          <ElFormItem label="单位">
+            <ElInput v-model="editingMaterial.unit" placeholder="单位" required />
           </ElFormItem>
           <ElFormItem label="成本价">
-            <ElInput v-model="editingProduct.cost_price" placeholder="成本价" required />
+            <ElInput v-model="editingMaterial.costPrice" placeholder="成本价" required />
           </ElFormItem>
-          <ElFormItem label="包装">
-            <ElInput v-model="editingProduct.packaging" placeholder="包装" required />
-          </ElFormItem>
-          <ElFormItem label="入库日期">
-            <ElInput v-model="editingProduct.inbound_date" placeholder="入库日期" required />
-          </ElFormItem>
-          <ElFormItem label="数量">
-            <ElInput v-model="editingProduct.quantity" placeholder="数量" required />
-          </ElFormItem>
-          <ElFormItem label="盘点前数量">
-            <ElInput v-model="editingProduct.auditedCount" placeholder="盘点前数量" required />
-          </ElFormItem>
-          <ElFormItem label="盘点后数量">
-            <ElInput v-model="editingProduct.systemCount" placeholder="盘点后数量" required />
-          </ElFormItem>
-          <ElFormItem label="盘点前后差异">
-            <ElInput v-model="editingProduct.difference" placeholder="盘点前后差异" required />
+          <ElFormItem label="售价">
+            <ElInput v-model="editingMaterial.sellingPrice" placeholder="售价" required />
           </ElFormItem>
           <ElFormItem class="form-actions">
-            <ElButton type="primary" @click="updateProductHandler">
-              更新产品
+            <ElButton type="primary" @click="updateMaterialHandler">
+              更新材料
             </ElButton>
-            <ElButton @click="editingProduct = null">
+            <ElButton @click="editingMaterial = null">
               取消
             </ElButton>
           </ElFormItem>
@@ -179,6 +172,8 @@ function removeProductHandler(product_number) {
     </div>
   </div>
 </template>
+
+
 
 <style scoped>
 .container {
@@ -190,14 +185,18 @@ h1 {
   text-align: center;
 }
 
+.search-container {
+  margin-bottom: 20px;
+}
+
 .el-table th,
- .el-table td {
+.el-table td {
   padding: 8px !important;
   border-right: 1px solid #ebeef5;
 }
 
 .el-table th:last-child,
- .el-table td:last-child {
+.el-table td:last-child {
   border-right: none;
 }
 
