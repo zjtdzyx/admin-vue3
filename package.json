@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build --base=/jianong-admin/",
+    "build": "vite build ",
     "build:test": "vue-tsc -b && vite build --mode test",
     "serve": "http-server ./dist -o",
     "serve:test": "http-server ./dist-test -o",
