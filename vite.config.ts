@@ -32,7 +32,7 @@ export default defineConfig(({ mode, command }) => {
         },
       },
     },
-    'base':'/admin-vue3/',
+    // 'base':'/admin-vue3/',
     'plugins': [
       createVitePlugins(mode, command === 'build'),
       checker({ typescript: false }), // 添加这行来忽略 TypeScript 类型检查
