@@ -12,15 +12,38 @@
     <meta http-equiv="Cache-control" content="no-cache" />
     <meta http-equiv="Cache" content="no-cache" />
     <title>公司后台信息管理系统</title>
-    <script type="module" crossorigin src="/admin-vue3/assets/index-hvzRevkC.js"></script>
+    <script type="module" crossorigin src="/admin-vue3/assets/index-DvTWmKn0.js"></script>
     <link rel="stylesheet" crossorigin href="/admin-vue3/assets/index-Cezw35lK.css">
   </head>
   <body>
     <div id="app">
-
+      <div id="browser-upgrade">
+        <div class="title">为了您的体验，推荐使用以下浏览器</div>
+        <div class="browsers">
+          <a
+            href="https://www.microsoft.com/edge"
+            target="_blank"
+            class="browser"
+          >
+            <img class="browser-icon" src="/admin-vue3/browser_upgrade/edge.png" />
+            <div class="browser-name">Microsoft Edge</div>
+          </a>
+          <a
+            href="https://www.google.cn/chrome/"
+            target="_blank"
+            class="browser"
+          >
+            <img class="browser-icon" src="/admin-vue3/browser_upgrade/chrome.png" />
+            <div class="browser-name">Google Chrome</div>
+          </a>
+        </div>
+      </div>
     </div>
-
-
+    <script>
+      if (!!window.ActiveXObject || 'ActiveXObject' in window) {
+        document.getElementById('browser-upgrade').style.display = 'block';
+      }
+    </script>
   <div data-app-loading style="position: fixed; top: 0; left: 0; z-index: 10000; width: 100vw; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; user-select: none;"><style>
   @keyframes rainbow {
     0% {
