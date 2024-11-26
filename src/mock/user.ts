@@ -6,14 +6,23 @@ export default defineFakeRoute([
     url: '/mock/user/login',
     method: 'post',
     response: ({ body }) => {
-      return {
-        error: '',
-        status: 1,
-        data: Mock.mock({
-          account: body.account,
-          token: `${body.account}_@string`,
-          avatar: 'https://fantastic-admin.hurui.me/logo.png',
-        }),
+      const { account, password } = body
+      if (account === 'admin' && password === '123456') {
+        return {
+          error: '',
+          status: 1,
+          data: Mock.mock({
+            account: body.account,
+            token: `${body.account}_fake_token`,
+            avatar: 'src/assets/images/logo.png',
+          }),
+        }
+      } else {
+        return {
+          error: '用户名或密码错误',
+          status: 0,
+          data: null,
+        }
       }
     },
   },
@@ -22,15 +31,14 @@ export default defineFakeRoute([
     method: 'get',
     response: ({ headers }) => {
       let permissions: string[] = []
-      if (headers.token?.indexOf('admin') === 0) {
+      if (headers.token?.indexOf('admin_fake_token') === 0) {
         permissions = [
           'permission.browse',
           'permission.create',
           'permission.edit',
           'permission.remove',
         ]
-      }
-      else if (headers.token?.indexOf('test') === 0) {
+      } else if (headers.token?.indexOf('test') === 0) {
         permissions = ['permission.browse']
       }
       return {

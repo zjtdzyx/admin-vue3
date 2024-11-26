@@ -1,11 +1,9 @@
+import { createApp } from 'vue'
 import FloatingVue from 'floating-vue'
-
 import Message from 'vue-m-message'
 import App from './App.vue'
-
 import router from './router'
 import pinia from './store'
-
 import ui from './ui-provider'
 
 import '@/utils/system.copyright'
@@ -28,8 +26,11 @@ import 'virtual:uno.css'
 // 全局样式
 import '@/assets/styles/globals.css'
 
-// 引入 Mock 数据
-import '@/mock/mock'
+// 根据环境变量决定是否启用Mock数据
+if (import.meta.env.VITE_BUILD_MOCK === 'true') {
+  import('@/mock/mock')
+}
+
 
 const app = createApp(App)
 app.use(FloatingVue, {
@@ -40,6 +41,7 @@ app.use(pinia)
 app.use(router)
 app.use(ui)
 directive(app)
+
 if (icons.isOfflineUse) {
   for (const info of icons.collections) {
     downloadAndInstall(info)

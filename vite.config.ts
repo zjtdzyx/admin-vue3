@@ -10,6 +10,7 @@ import createVitePlugins from './vite/plugins'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd())
+
   // 全局 scss 资源
   const scssResources: string[] = []
   fs.readdirSync('src/assets/styles/resources').forEach((dirname) => {
@@ -19,6 +20,7 @@ export default defineConfig(({ mode, command }) => {
       )
     }
   })
+
   return {
     // 开发服务器选项 https://cn.vitejs.dev/config/server-options
     'server': {
@@ -32,7 +34,7 @@ export default defineConfig(({ mode, command }) => {
         },
       },
     },
-    // 'base':'/admin-vue3/',
+    'base': mode === 'production' ? '/admin-vue3/' : '/',
     'plugins': [
       createVitePlugins(mode, command === 'build'),
       checker({ typescript: false }), // 添加这行来忽略 TypeScript 类型检查
