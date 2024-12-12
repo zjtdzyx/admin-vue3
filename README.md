@@ -28,6 +28,8 @@
 ## 部署
 
 ```
+//项目克隆
+git clone https://github.com/zjtdzyx/admin-vue3.git
 //项目指定包管理器为pnpm
 npm i pnpm -g
 //使用pnpm安装项目依赖
